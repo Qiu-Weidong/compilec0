@@ -1,0 +1,5 @@
+[jobs.c0]
+image = {source = "dockerfile", path = ".", tag = "c0"}
+run = [
+  "./C_ZERO -l $input -o $asm",
+]

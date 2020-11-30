@@ -16,7 +16,7 @@ project(C_ZERO)
 # add_library(demo ${SRC_LIST}) # 将变量中的cpp文件全部编译为静态库
 
 aux_source_directory(./source SRC_LIST)
-add_executable(C_ZERO_CMAKE_PROJECT ${SRC_LIST})
+add_executable(C_ZERO ${SRC_LIST})
 # set(sfml_include_path C:/Users/56838/SFML-2.5.1/include)
 # set(sfml_lib_path C:/Users/56838/SFML-2.5.1/lib)
 include_directories(

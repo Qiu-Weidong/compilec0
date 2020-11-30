@@ -6,6 +6,7 @@
 
 int main(int argc, char *argv[])
 {
+    printf("just for test!\n");
     Tokenizer tokenizer;
     // std::ofstream fout;
     try
