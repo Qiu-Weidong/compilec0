@@ -238,6 +238,11 @@ void Tokenizer::analyseUint()
         {
             buffer += nextChar;
             getNextChar();
+            if(nextChar == '+'||nextChar == '-')
+            {
+                buffer += nextChar;
+                getNextChar();
+            }
             if(!isdigit(nextChar)) throw Error(ErrorCode::ErrEOF,currentPos);
             while (isdigit(nextChar))
             {
@@ -385,5 +390,11 @@ void Tokenizer::analyseIdent()
         tokens.push_back(Token(TokenType::BREAK_KW,pos,currentPos));
     else if(buffer == "continue")
         tokens.push_back(Token(TokenType::CONTINUE_KW,pos,currentPos));
+    else if(buffer == "int")
+        tokens.push_back(Token(TokenType::TY,1ll,pos,currentPos));
+    else if(buffer == "void")
+        tokens.push_back(Token(TokenType::TY,0ll,pos,currentPos));
+    else if(buffer == "double")
+        tokens.push_back(Token(TokenType::TY,2ll,pos,currentPos));
     else tokens.push_back(Token(TokenType::IDENT,buffer.c_str(),pos,currentPos));
 }

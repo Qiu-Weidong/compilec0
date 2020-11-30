@@ -52,6 +52,9 @@ enum class TokenType : int
     COLON, // -> ':'
     SEMICOLON, // -> ';'
     COMMENT, // '//' ..... '\n'
+
+    // 类型
+    TY
 };
 
 class Token

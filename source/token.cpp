@@ -14,6 +14,8 @@ Token::Token(const TokenType type, const long long value, const position &start,
         this->value.f = (double)value;
     else if (type == TokenType::CHAR_LITERAL) // 如果是字符字面值，则将value转换为字符
         this->value.c = (char)value;
+    else if(type == TokenType::TY) // 如果是类型
+        this->value.n = value;
     else
         this->value.s = nullptr;
 }
@@ -58,7 +60,7 @@ Token::Token(const TokenType type, const char *value, const position &start, con
     this->type = type;
     this->start = start;
     this->end = end;
-    if (type == TokenType::STRING_LITERAL || type == TokenType::IDENT || type == TokenType::COMMENT)
+    if (type == TokenType::STRING_LITERAL || type == TokenType::IDENT || type == TokenType::COMMENT )
     {
         int len = strlen(value);
         this->value.s = new char[len + 1];
@@ -70,7 +72,7 @@ Token::Token(const TokenType type, const char *value, const position &start, con
 Token::~Token()
 {
     if ((type == TokenType::IDENT || type == TokenType::COMMENT||
-         type == TokenType::STRING_LITERAL) &&
+         type == TokenType::STRING_LITERAL ) &&
         value.s != nullptr)
         delete[] value.s;
 }
@@ -239,6 +241,12 @@ std::ostream & operator<<(std::ostream & os,const Token & token)
     case TokenType::WHILE_KW:
         os << "WHILE_KW start:" << token.start << "end:" << token.end<< std::endl;
         break;
+    case TokenType::TY:
+    {
+        if(token.value.n == 0) os << "TY: void start:" << token.start << " end: "<<token.end << std::endl;
+        else if(token.value.n == 1) os << "TY: int start:" << token.start << " end: "<<token.end << std::endl;
+        else if(token.value.n == 2) os << "TY: double start:" << token.start << " end: "<<token.end << std::endl;
+    }
     default:
         break;
     }

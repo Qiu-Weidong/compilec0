@@ -3,13 +3,10 @@
 #include <string>
 #include "tokenizer.h"
 #include "error.h"
-// char buf[10006];
+
 int main(int argc, char *argv[])
 {
     Tokenizer tokenizer;
-    std::fstream fout;
-    fout.open(argv[4]);
-    fout << ".." << std::endl;
     try
     {
         tokenizer.analyse(argv[2]);
@@ -21,12 +18,12 @@ int main(int argc, char *argv[])
     }
     catch (Error &err)
     {
-        // std::cerr << err << std::endl;
+        std::cerr << err << std::endl;
         return -1;
     }
     catch (const std::exception &e)
     {
-        // std::cerr << e.what() << '\n';
+        std::cerr << e.what() << '\n';
         return -1;
     }
 
