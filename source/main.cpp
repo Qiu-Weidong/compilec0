@@ -7,7 +7,9 @@
 int main(int argc, char *argv[])
 {
     Tokenizer tokenizer;
-    
+    std::fstream fout;
+    fout.open(argv[4]);
+    fout << ".." << std::endl;
     try
     {
         tokenizer.analyse(argv[2]);
