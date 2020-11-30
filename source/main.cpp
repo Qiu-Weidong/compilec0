@@ -3,16 +3,18 @@
 #include <string>
 #include "tokenizer.h"
 #include "error.h"
-
+// char buf[10006];
 int main(int argc, char *argv[])
 {
     Tokenizer tokenizer;
     std::fstream fin;
     fin.open(argv[2]);
     std::string buf;
-    // std::fstream fout;
-    while(fin >> buf)
+    while (std::getline(fin,buf))
+    {
         std::cout << buf << std::endl;
+    }
+    
     // try
     // {
     //     tokenizer.analyse(argv[1]);
