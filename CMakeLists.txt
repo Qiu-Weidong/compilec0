@@ -1,5 +1,5 @@
 # 指定CMake的版本
-cmake_minimum_required(VERSION 3.19.0)
+cmake_minimum_required(VERSION 3.17.0)
 # 指定项目名称，这条命名会引入两个变量<projectname>_BINARY_DIR和<projectname>_SOURCE_DIR
 # 同时，cmake 自动定义了两个等价的变量 PROJECT_BINARY_DIR 和 PROJECT_SOURCE_DIR，用于
 # 指向编译后的二进制文件目录和源文件目录
