@@ -10,9 +10,9 @@ int main(int argc, char *argv[])
     std::fstream fin;
     fin.open(argv[2]);
     std::string buf;
-    std::fstream fout;
+    // std::fstream fout;
     while(fin >> buf)
-        fout << buf << std::endl;
+        std::cout << buf << std::endl;
     // try
     // {
     //     tokenizer.analyse(argv[1]);
