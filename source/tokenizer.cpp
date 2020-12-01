@@ -18,6 +18,8 @@ void Tokenizer::analyse(const char *file_name)
     {
         stateTransition();
     }
+    // 添加一个哨兵token
+    tokens.push_back(Token(TokenType::NONE,currentPos,currentPos));
 }
 
 char Tokenizer::getNextChar()

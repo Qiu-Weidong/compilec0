@@ -54,7 +54,9 @@ enum class TokenType : int
     COMMENT, // '//' ..... '\n'
 
     // 类型
-    TY
+    TY,
+    // 用于标记的哨兵
+    NONE
 };
 
 class Token

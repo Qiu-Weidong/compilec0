@@ -124,6 +124,8 @@ std::ostream &operator<<(std::ostream &os, const Token &token)
     case TokenType::TY:
         buffer = "TY";
         break;
+    case TokenType::NONE:
+        buffer = "NONE";
     default:
         break;
     }
