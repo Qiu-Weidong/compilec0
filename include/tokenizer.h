@@ -35,12 +35,12 @@ private:
     ////////////////////
     /// \brief 当前位置
     ////////////////////
-    position currentPos;
+    Position currentPos;
 
     ////////////////////
     /// \brief 下一个位置
     ////////////////////
-    position nextPos;
+    Position nextPos;
 
     //////////////////
     /// \brief 读入的文件流

@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
         auto tokens = tokenizer.getTokens();
         for (const auto &token : tokens)
         {
-            std::cout << token;
+            std::cout << token << std::endl;
         }
     }
     catch (Error &err)

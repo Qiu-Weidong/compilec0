@@ -69,65 +69,32 @@ private:
     /// \brief 表示token值的union，
     ///        值的类型可以是字符串，字符，和整数以及浮点数
     //////////////////
-    union 
-    {
-        char * s;
-        char c;
-        long long n;
-        double f;
-    }value;
+    std::string value;
 
     ///////////////
     /// \brief 该token开始的位置
     ///////////////
-    position start;
+    Position start;
 
     //////////////////
     /// \brief 该token结束的位置
     //////////////////
-    position end;
+    Position end;
     
 public:
     /////////////////////////////
     /// \brief 默认构造函数，将value.s置为nullptr
     /////////////////////////////
-    Token() { value.s = nullptr; }
+    Token() = default;
 
     ///////////////////////////////////////
     /// \brief token的值为long long的时候的构造函数
     /// \param type token的类型
-    /// \param value token的值，这时是long long
+    /// \param value token的值
     /// \param start 这个token的开始位置
     /// \param end 这个token的结束位置
     ///////////////////////////////////////
-    Token(const TokenType type,const long long value,const position & start,const position & end);
-
-    ////////////////////////////////////////
-    /// \brief token的值为char的时候的构造函数
-    /// \param type token的类型
-    /// \param value token的值，这时是char
-    /// \param start 这个token的开始位置
-    /// \param end 这个token的结束位置
-    ///////////////////////////////////////
-    Token(const TokenType type,const char value,const position & start,const position & end);
-
-    ////////////////////////////////////////
-    /// \brief token的值为double的时候的构造函数
-    /// \param type token的类型
-    /// \param value token的值，这时是double
-    /// \param start 这个token的开始位置
-    /// \param end 这个token的结束位置
-    ///////////////////////////////////////
-    Token(const TokenType type,const double value,const position & start,const position & end);
-
-    ////////////////////////////////////////
-    /// \brief token的值为double的时候的构造函数
-    /// \param type token的类型
-    /// \param value token的值，这时是double
-    /// \param start 这个token的开始位置
-    /// \param end 这个token的结束位置
-    ///////////////////////////////////////
-    Token(const TokenType type,const char * value,const position & start,const position & end);
+    Token(const TokenType type,const std::string & value,const Position & start,const Position & end);
     
     ////////////////////////////////////////
     /// \brief token没有值的时候的构造函数
@@ -135,42 +102,39 @@ public:
     /// \param start 这个token的开始位置
     /// \param end 这个token的结束位置
     ///////////////////////////////////////
-    Token(const TokenType type,const position & start,const position & end);
+    Token(const TokenType type,const Position & start,const Position & end);
     
     ///////////////////////
     /// \brief 析构函数，主要用于字符串空间的释放
     ///////////////////////
-    ~Token();
+    ~Token() = default;
 
     //////////////////////
     /// \brief 复制构造函数
     /// \param token 
     //////////////////////
-    Token(const Token & token);
+    Token(const Token & token) = default;
 
     //////////////////////
     /// \brief 移动构造函数
     /// \param token 
     //////////////////////
-    Token(Token && token);
+    Token(Token && token) = default;
 
     /////////////////////
     /// \brief 赋值运算符
     /// \param token
     /////////////////////
-    Token & operator=(const Token & token);
+    Token & operator=(const Token & token) = default;
 
     ////////////////////////
     /// \brief 移动赋值
     /// \param token
     ////////////////////////
-    Token & operator=(Token && token);
+    Token & operator=(Token && token) = default;
 
     TokenType getTokenType() const { return type;}
-    long long getIntegerValue() const { return value.n;}
-    char getCharValue() const { return value.c; }
-    const char * getStringValue() const { return value.s; }
-    double getDoubleValue() const { return value.f; }
+    const std::string & getValue() const { return value; }
     friend std::ostream & operator<<(std::ostream & os,const Token & token);
 };
 #endif // TOKEN_H_

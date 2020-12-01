@@ -1,7 +1,7 @@
 #ifndef POSITION_H_
 #define POSITION_H_
 #include <iostream>
-struct position
+struct Position
 {   
     //////////
     /// \brief 所在的行
@@ -18,12 +18,12 @@ struct position
     /// \param row 行
     /// \param col 列
     ////////////////////////////
-    position(int row=0,int col=0)
+    Position(int row=0,int col=0)
     {
         this->row = row;
         this->col = col;
     }
-    friend std::ostream & operator<<(std::ostream & os, const position & p)
+    friend std::ostream & operator<<(std::ostream & os, const Position & p)
     {
         os << "(" << p.row << "," << p.col << ")";
         return os;

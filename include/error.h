@@ -42,14 +42,14 @@ private:
     ///////////////
     /// \brief 错误的位置
     ///////////////
-    position pos;
+    Position pos;
 public:
-    Error(ErrorCode code , position pos) { this->code = code; this->pos = pos; }
+    Error(ErrorCode code , Position pos) { this->code = code; this->pos = pos; }
     ~Error() = default;
 
     // virtual const char * what() const override {}
     ErrorCode getCode() const { return code ;}
-    position getPosition() const  { return pos; }
+    Position getPosition() const  { return pos; }
 
     friend std::ostream & operator<<(std::ostream & os,const Error & err) {
         os << "row:" << err.pos.row << ",col:" << err.pos.col << "error!" << std::endl ;

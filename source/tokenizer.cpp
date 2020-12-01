@@ -6,13 +6,13 @@ void Tokenizer::analyse(const char *file_name)
 {
     fin.open(file_name);
     if (!fin.is_open())
-        throw Error(ErrorCode::ErrNoFile, position(0, 0));
+        throw Error(ErrorCode::ErrNoFile, Position(0, 0));
     currentChar = nextChar = '\0';
     // nextChar = fin.get();
     buffer.clear();
     currentState = DFAState::INITIAL_STATE;
-    currentPos = position(-1,-1);
-    nextPos = position(0,-1);
+    currentPos = Position(-1,-1);
+    nextPos = Position(0,-1);
     getNextChar();
     while (currentChar != EOF)
     {
@@ -30,7 +30,6 @@ char Tokenizer::getNextChar()
     }
     else nextPos.col++;
     currentChar = nextChar;
-    // currentPos = nextPos;
     if (currentChar == EOF)
         return EOF;
     nextChar = fin.get();
@@ -220,12 +219,10 @@ void Tokenizer::analyseUint()
 {
     // nextPos指向第一个数字的位置
     buffer.clear();
-    long long value = 0;
     auto pos = nextPos;
     while (isdigit(nextChar))
     {
         buffer += nextChar;
-        value = value*10 + nextChar - '0';
         getNextChar();
     }
     if(nextChar == '.')
@@ -250,10 +247,10 @@ void Tokenizer::analyseUint()
                 getNextChar();
             }
         }
-        tokens.push_back(Token(TokenType::DOUBLE_LITERAL,atof(buffer.c_str()),pos,currentPos));
+        tokens.push_back(Token(TokenType::DOUBLE_LITERAL,buffer,pos,currentPos));
     }
     else 
-        tokens.push_back(Token(TokenType::UINT_LITERAL,value,pos,currentPos));
+        tokens.push_back(Token(TokenType::UINT_LITERAL,buffer,pos,currentPos));
     buffer.clear();
     currentState = DFAState::INITIAL_STATE;
 }
@@ -301,12 +298,12 @@ void Tokenizer::analyseString()
     if(nextChar == EOF) throw Error(ErrorCode::ErrAssignToConstant,currentPos);
     getNextChar();
     currentState = DFAState::INITIAL_STATE;
-    tokens.push_back(Token(TokenType::STRING_LITERAL,buffer.c_str(),pos,currentPos));
+    tokens.push_back(Token(TokenType::STRING_LITERAL,buffer,pos,currentPos));
 }
 void Tokenizer::analyseChar()
 {
     getNextChar(); // 此时currentChar指向'\''
-    char value;
+    buffer.clear();
     auto pos = nextPos;
     if(nextChar == '\\')
     {
@@ -314,22 +311,22 @@ void Tokenizer::analyseChar()
         switch (nextChar)
             {
             case 'n':
-                value = '\n';
+                buffer = "\n";
                 break;
             case 't':
-                value = '\t';
+                buffer = "\t";
                 break;
             case 'r':
-                value = '\r';
+                buffer = "\r";
                 break;
             case '\'':
-                value = '\'';
+                buffer = "\'";
                 break;
             case '\"':
-                value = '\"';
+                buffer = "\"";
                 break;
             case '\\':
-                value = '\\';
+                buffer = "\\";
                 break;
             default:
                 throw Error(ErrorCode::ErrAssignToConstant,currentPos);
@@ -337,13 +334,13 @@ void Tokenizer::analyseChar()
             }
     }
     else {
-        value = nextChar;
+        buffer = "" + nextChar;
     }
     getNextChar();
     if(nextChar != '\'') throw Error(ErrorCode::ErrAssignToConstant,currentPos);
     getNextChar();
     currentState = DFAState::INITIAL_STATE;
-    tokens.push_back(Token(TokenType::CHAR_LITERAL,value,pos,currentPos));
+    tokens.push_back(Token(TokenType::CHAR_LITERAL,buffer,pos,currentPos));
 }
 void Tokenizer::analyseComment()
 {
@@ -354,7 +351,7 @@ void Tokenizer::analyseComment()
         buffer += nextChar;
         getNextChar();
     }
-    tokens.push_back(Token(TokenType::COMMENT,buffer.c_str(),pos,currentPos));
+    tokens.push_back(Token(TokenType::COMMENT,buffer,pos,currentPos));
     currentState = DFAState::INITIAL_STATE;
 }
 void Tokenizer::analyseIdent()
@@ -369,7 +366,6 @@ void Tokenizer::analyseIdent()
         getNextChar();
     }
     currentState = DFAState::INITIAL_STATE;
-    // std::cout << "... "<< buffer << std::endl;
     if(buffer == "fn")
         tokens.push_back(Token(TokenType::FN_KW,pos,currentPos));
     else if(buffer == "let")
@@ -391,10 +387,10 @@ void Tokenizer::analyseIdent()
     else if(buffer == "continue")
         tokens.push_back(Token(TokenType::CONTINUE_KW,pos,currentPos));
     else if(buffer == "int")
-        tokens.push_back(Token(TokenType::TY,1ll,pos,currentPos));
+        tokens.push_back(Token(TokenType::TY,buffer,pos,currentPos));
     else if(buffer == "void")
-        tokens.push_back(Token(TokenType::TY,0ll,pos,currentPos));
+        tokens.push_back(Token(TokenType::TY,buffer,pos,currentPos));
     else if(buffer == "double")
-        tokens.push_back(Token(TokenType::TY,2ll,pos,currentPos));
-    else tokens.push_back(Token(TokenType::IDENT,buffer.c_str(),pos,currentPos));
+        tokens.push_back(Token(TokenType::TY,buffer,pos,currentPos));
+    else tokens.push_back(Token(TokenType::IDENT,buffer,pos,currentPos));
 }
