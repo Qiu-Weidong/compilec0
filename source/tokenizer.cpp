@@ -353,7 +353,8 @@ void Tokenizer::analyseComment()
         buffer += nextChar;
         getNextChar();
     }
-    tokens.push_back(Token(TokenType::COMMENT,buffer,pos,currentPos));
+    // 注释不添加到tokens列表当中。
+    // tokens.push_back(Token(TokenType::COMMENT,buffer,pos,currentPos));
     currentState = DFAState::INITIAL_STATE;
 }
 void Tokenizer::analyseIdent()

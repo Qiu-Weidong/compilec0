@@ -3,6 +3,7 @@
 #include <string>
 #include "tokenizer.h"
 #include "error.h"
+#include "analyser.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,10 +12,8 @@ int main(int argc, char *argv[])
     {
         tokenizer.analyse(argv[2]);
         auto tokens = tokenizer.getTokens();
-        for (const auto &token : tokens)
-        {
-            std::cout << token << std::endl;
-        }
+        Analyser analyser(tokens);
+        analyser.program();
     }
     catch (Error &err)
     {

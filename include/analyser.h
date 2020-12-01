@@ -3,20 +3,64 @@
 #include <vector>
 #include "token.h"
 
+/*
+ * 分析
+ * 终结符有如下这些: 38个，除去注释37个
+ * 关键字:  FN_KW、LET_KW、CONST_KW、AS_KW、WHILE_KW、IF_KW、
+ *          ELSE_KW、RETURN_KW 、BREAK_KW、CONTINUE_KW 
+ * 字面量: UINT_LITERAL 、DOUBLE_LITERAL 、STRING_LITERAL 
+ *          CHAR_LITERAL 
+ * 类型: INT、DOUBLE、VOID
+ * 符号: PLUS、MINUS、MUL、DIV、ASSIGN、EQ、NEQ、LT、GT、
+ *       LE、GE、L_PAREN、R_PAREN、L_BRACE、R_BRACE、ARROW、
+ *       COMMA、COLON、SEMICOLON
+ * 注释: COMMENT
+ * 标识符: IDENT
+ * 
+ * 非终结符 28个
+ * <expr>、
+ * <operator_expr>、<negate_expr>、<assign_expr>、
+ * <as_expr>、<call_expr>、<literal_expr>、
+ * <ident_expr>、<group_expr>、
+ * 
+ * <call_param_list>、
+ * 
+ * <stmt>、<expr_stmt>、<decl_stmt>、
+ * <if_stmt>、<while_stmt>、<break_stmt>、
+ * <continue_stmt>、<return_stmt>、
+ * <block_stmt>、<empty_stmt>、
+ * 
+ * <let_decl_stmt>、<const_decl_stmt>、<decl_stmt>
+ * 
+ * <function_param>、<function_param_list>、<function>
+ * <program>、<item>
+*/
 class Analyser
 {
 private:
     const std::vector<Token> & tokens;
     int index;
+
     const Token & peek() const;
     const Token & next() ;
     const Token & current() const;
     const Token & previous();
     void expect(TokenType type) ;
-    bool has_next() const { return index < tokens.size(); }
+    bool has_next() const 
+    {
+        if(index+1 >= tokens.size()) return false;
+        return tokens[index+1].getTokenType() != TokenType::NONE;
+    }
     bool has_previous() const { return index > 0; }
 
 public:
+    Analyser(std::vector<Token> _tokens) : tokens(_tokens) { index = 0; }
+    Analyser(const Analyser & ) = delete;
+    Analyser(Analyser && ) = delete;
+    ~Analyser() = default;
+    Analyser & operator=(const Analyser &) = delete;
+    Analyser & operator=(Analyser &&) = delete;
+
     //////////////
     /// \brief program -> item*
     //////////////
@@ -46,6 +90,11 @@ public:
     /// \brief function_param_list -> function_param (',' function_param)*
     ///////////////////////
     void func_param_list();
+
+    /////////////////////////
+    /// \brief stmt
+    /////////////////////////
+    void stmt();
 
     ////////////////////
     /// \brief empty_stmt -> ';'
