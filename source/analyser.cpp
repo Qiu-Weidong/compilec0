@@ -8,7 +8,7 @@ bool isExpressionTermination(TokenType type);
 //////////////
 void Analyser::program()
 {
-    printf("program!\n");
+    // printf("program!\n");
     while(has_next())
     {
         item();
@@ -21,9 +21,8 @@ void Analyser::program()
 //////////////////
 void Analyser::item()
 {
-    printf("item\n");
+    // printf("item\n");
     auto t = peek().getTokenType();
-    printf("%d\n",t);
     if(t == TokenType::FN_KW)
     {
         func();
@@ -40,7 +39,7 @@ void Analyser::item()
 /////////////////
 void Analyser::decl_stmt()
 {
-    printf("decl_stmt\n");
+    // printf("decl_stmt\n");
     if(peek().getTokenType() == TokenType::LET_KW)
     {
         let_decl_stmt();
@@ -57,7 +56,7 @@ void Analyser::decl_stmt()
 //////////////////
 void Analyser::func()
 {
-    printf("func\n");
+    // printf("func\n");
     expect(TokenType::FN_KW);
     expect(TokenType::IDENT);
     expect(TokenType::L_PAREN);
@@ -74,7 +73,7 @@ void Analyser::func()
 /////////////////////
 void Analyser::func_param()
 {
-    printf("func_param\n");
+    // printf("func_param\n");
     if(peek().getTokenType() == TokenType::CONST_KW) next();
     expect(TokenType::IDENT);
     expect(TokenType::COLON);
@@ -86,7 +85,7 @@ void Analyser::func_param()
 ///////////////////////
 void Analyser::func_param_list()
 {
-    printf("func_param_list\n");
+    // printf("func_param_list\n");
     func_param();
     while(peek().getTokenType() == TokenType::COMMA)
     {
@@ -108,7 +107,7 @@ void Analyser::func_param_list()
 /////////////////////
 void Analyser::stmt()
 {
-    printf("stmt\n");
+    // printf("stmt\n");
     auto type = peek().getTokenType();
     if(type == TokenType::LET_KW || type == TokenType::CONST_KW) decl_stmt();
     else if(type == TokenType::IF_KW) if_stmt();
@@ -127,7 +126,7 @@ void Analyser::stmt()
 ////////////////////
 void Analyser::empty_stmt()
 {
-    printf("empty_stmt\n");
+    // printf("empty_stmt\n");
     expect(TokenType::SEMICOLON);
 }
 
@@ -136,7 +135,7 @@ void Analyser::empty_stmt()
 //////////////////
 void Analyser::block_stmt()
 {
-    printf("block_stmt\n");
+    // printf("block_stmt\n");
     expect(TokenType::L_BRACE);
     while(has_next() && peek().getTokenType() != TokenType::R_BRACE)
         stmt();
@@ -148,7 +147,7 @@ void Analyser::block_stmt()
 //////////////////
 void Analyser::return_stmt()
 {
-    printf("return_stmt\n");
+    // printf("return_stmt\n");
     expect(TokenType::RETURN_KW);
     expr();
     expect(TokenType::SEMICOLON);
@@ -159,7 +158,7 @@ void Analyser::return_stmt()
 ////////////////////
 void Analyser::continue_stmt()
 {
-    printf("continue_stmt\n");
+    // printf("continue_stmt\n");
     expect(TokenType::CONTINUE_KW);
     expect(TokenType::SEMICOLON);
 }
@@ -169,7 +168,7 @@ void Analyser::continue_stmt()
 /////////////////
 void Analyser::break_stmt()
 {
-    printf("break_stmt\n");
+    // printf("break_stmt\n");
     expect(TokenType::BREAK_KW);
     expect(TokenType::SEMICOLON);
 }
@@ -179,7 +178,7 @@ void Analyser::break_stmt()
 //////////////////
 void Analyser::while_stmt()
 {
-    printf("while_stmt\n");
+    // printf("while_stmt\n");
     expect(TokenType::WHILE_KW);
     expr();
     block_stmt();
@@ -190,15 +189,13 @@ void Analyser::while_stmt()
 ///////////////
 void Analyser::if_stmt()
 {
-    printf("if_stmt\n");
+    // printf("if_stmt\n");
     expect(TokenType::IF_KW);
     expr();
     block_stmt();
     while(peek().getTokenType() == TokenType::ELSE_KW)
     {
         next();
-        // printf("%");
-        // std::cout << current().getStart() << std::endl;
         if(peek().getTokenType() == TokenType::IF_KW)
         {
             next();
@@ -217,11 +214,12 @@ void Analyser::if_stmt()
 //////////////////////
 void Analyser::const_decl_stmt()
 {
-    printf("const_decl_stmt\n");
+    // printf("const_decl_stmt\n");
     expect(TokenType::CONST_KW);
     expect(TokenType::IDENT);
     expect(TokenType::COLON);
     expect(TokenType::TY);
+    if(current().getValue() == "void") throw Error(ErrorCode::InvalidDeclare,"variant can\'t be \'void\'!",current().getStart());
     expect(TokenType::ASSIGN);
     expr();
     expect(TokenType::SEMICOLON);
@@ -232,11 +230,12 @@ void Analyser::const_decl_stmt()
 //////////////////////
 void Analyser::let_decl_stmt()
 {
-    printf("let_decl_stmt\n");
+    // printf("let_decl_stmt\n");
     expect(TokenType::LET_KW);
     expect(TokenType::IDENT);
     expect(TokenType::COLON);
     expect(TokenType::TY);
+    if(current().getValue() == "void") throw Error(ErrorCode::InvalidDeclare,"variant can\'t be \'void\'!",current().getStart());
     if(peek().getTokenType() == TokenType::ASSIGN)
     {
         next();
@@ -250,7 +249,7 @@ void Analyser::let_decl_stmt()
 /////////////////
 void Analyser::expr_stmt()
 {
-    printf("expr_stmt\n");
+    // printf("expr_stmt\n");
     expr();
     expect(TokenType::SEMICOLON);
 }
@@ -284,7 +283,7 @@ bool isExpressionTermination(TokenType type)
 }
 void Analyser::expr()
 {
-    printf("expr\n");
+    // printf("expr\n");
     // auto t = peek().getTokenType();
     // if(t == TokenType::MINUS) negate_expr();
     // else if(t == TokenType::L_PAREN) group_expr();
@@ -304,7 +303,7 @@ void Analyser::operator_expr()
 /////////////////////
 void Analyser::negate_expr()
 {
-    printf("negate_expr\n");
+    // printf("negate_expr\n");
     expect(TokenType::MINUS);
     expr();
 }
@@ -314,7 +313,7 @@ void Analyser::negate_expr()
 ////////////////////
 void Analyser::assign_expr()
 {
-    printf("assign_expr\n");
+    // printf("assign_expr\n");
     expect(TokenType::IDENT);
     expect(TokenType::ASSIGN);
     expr();
@@ -325,7 +324,7 @@ void Analyser::assign_expr()
 ///////////////////
 void Analyser::as_expr()
 {
-    printf("as_expr\n");
+    // printf("as_expr\n");
     expr();
     expect(TokenType::AS_KW);
     expect(TokenType::TY);
@@ -336,7 +335,7 @@ void Analyser::as_expr()
 //////////////////////
 void Analyser::call_param_list()
 {
-    printf("call_param_list\n");
+    // printf("call_param_list\n");
     expr();
     while(peek().getTokenType() == TokenType::COMMA)
     {
@@ -350,7 +349,7 @@ void Analyser::call_param_list()
 //////////////////////
 void Analyser::call_expr()
 {
-    printf("call_expr\n");
+    // printf("call_expr\n");
     expect(TokenType::IDENT);
     expect(TokenType::L_PAREN);
     call_param_list();
@@ -362,7 +361,7 @@ void Analyser::call_expr()
 /////////////////////
 void Analyser::literal_expr()
 {
-    printf("literal_expr\n");
+    // printf("literal_expr\n");
     auto t = peek().getTokenType();
     if(t != TokenType::UINT_LITERAL && t != TokenType::STRING_LITERAL &&
         t != TokenType::DOUBLE_LITERAL && t != TokenType::CHAR_LITERAL)
@@ -375,7 +374,7 @@ void Analyser::literal_expr()
 /////////////////////
 void Analyser::ident_expr()
 {
-    printf("ident_expr\n");
+    // printf("ident_expr\n");
     expect(TokenType::IDENT);
 }
 
@@ -384,7 +383,7 @@ void Analyser::ident_expr()
 ////////////////////
 void Analyser::group_expr()
 {
-    printf("group_expr\n");
+    // printf("group_expr\n");
     expect(TokenType::L_PAREN);
     expr();
     expect(TokenType::R_PAREN);
@@ -395,7 +394,7 @@ void Analyser::group_expr()
 /////////////////////
 void Analyser::l_expr()
 {
-    printf("l_expr\n");
+    // printf("l_expr\n");
     expect(TokenType::IDENT);
 }
 

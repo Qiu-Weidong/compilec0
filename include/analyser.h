@@ -55,7 +55,7 @@ private:
     bool has_previous() const { return index > 0; }
 
 public:
-    Analyser(std::vector<Token> & _tokens) : tokens(_tokens) 
+    Analyser(const std::vector<Token> & _tokens) : tokens(_tokens) 
     { 
         index = 0; sentinel = _tokens.at(_tokens.size()-1); 
     }
