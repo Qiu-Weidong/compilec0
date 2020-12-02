@@ -137,6 +137,8 @@ public:
 
     TokenType getTokenType() const { return type;}
     const std::string & getValue() const { return value; }
+    Position getStart() const { return start; }
+    Position getEnd() const { return end; }
     friend std::ostream & operator<<(std::ostream & os,const Token & token);
 };
 #endif // TOKEN_H_

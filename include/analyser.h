@@ -40,6 +40,7 @@ class Analyser
 private:
     const std::vector<Token> & tokens;
     int index;
+    Token sentinel;
 
     const Token & peek() const;
     const Token & next() ;
@@ -54,7 +55,7 @@ private:
     bool has_previous() const { return index > 0; }
 
 public:
-    Analyser(std::vector<Token> _tokens) : tokens(_tokens) { index = 0; }
+    Analyser(std::vector<Token> _tokens) : tokens(_tokens) { index = 0; sentinel = _tokens.at(_tokens.size()-1); }
     Analyser(const Analyser & ) = delete;
     Analyser(Analyser && ) = delete;
     ~Analyser() = default;

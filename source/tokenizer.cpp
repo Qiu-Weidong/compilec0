@@ -6,13 +6,14 @@ void Tokenizer::analyse(const char *file_name)
 {
     fin.open(file_name);
     if (!fin.is_open())
-        throw Error(ErrorCode::ErrNoFile, Position(0, 0));
+        throw Error(ErrorCode::NoInput,"Input not ready!");
+    
     currentChar = nextChar = '\0';
-    // nextChar = fin.get();
     buffer.clear();
     currentState = DFAState::INITIAL_STATE;
     currentPos = Position(-1,-1);
     nextPos = Position(0,-1);
+    tokens.push_back(Token(TokenType::NONE,currentPos,currentPos));
     getNextChar();
     while (currentChar != EOF)
     {
@@ -64,7 +65,7 @@ void Tokenizer::stateTransition()
         analyseComment();
         break;
     case DFAState::ERROR_STATE:
-        throw Error(ErrorCode::ErrIncompleteExpression, currentPos);
+        throw Error(ErrorCode::UnknownErr,"unknown error!",currentPos);
     default:
         break;
     }
@@ -77,7 +78,6 @@ void Tokenizer::analyseInitial()
     while(nextChar == ' ' || nextChar == '\n' || nextChar == '\r' || nextChar == '\t')
         getNextChar();
     auto pos = nextPos;
-    // std::cout << pos << std::endl;
     if(nextChar == '+'){
         getNextChar();
         tokens.push_back(Token(TokenType::PLUS,pos,currentPos));
@@ -130,7 +130,7 @@ void Tokenizer::analyseInitial()
         {
             tokens.push_back(Token(TokenType::NEQ,pos,currentPos));
         }
-        else throw Error(ErrorCode::ErrAssignToConstant,currentPos);
+        else throw Error(ErrorCode::InvalidSymbol,"\'=\' can\'t follow \'!\'!",currentPos);
     }
     else if(nextChar == '<')
     {
@@ -231,7 +231,7 @@ void Tokenizer::analyseUint()
     {
         buffer += nextChar;
         getNextChar();
-        if(!isdigit(nextChar)) throw Error(ErrorCode::ErrAssignToConstant,currentPos);
+        if(!isdigit(nextChar)) throw Error(ErrorCode::InvalidDoubleLiteral,"\'.\' must be followed with a digit!",currentPos);
         while(isdigit(nextChar)) buffer += nextChar,getNextChar();
         if(nextChar == 'e' || nextChar == 'E')
         {
@@ -242,7 +242,7 @@ void Tokenizer::analyseUint()
                 buffer += nextChar;
                 getNextChar();
             }
-            if(!isdigit(nextChar)) throw Error(ErrorCode::ErrEOF,currentPos);
+            if(!isdigit(nextChar)) throw Error(ErrorCode::InvalidDoubleLiteral,"invalid double literal!",currentPos);
             while (isdigit(nextChar))
             {
                 buffer += nextChar;
@@ -290,14 +290,14 @@ void Tokenizer::analyseString()
                 buffer += '\\';
                 break;
             default:
-                throw Error(ErrorCode::ErrAssignToConstant,currentPos);
+                throw Error(ErrorCode::UnknownChar,"invalid escape sequence!",currentPos);
                 break;
             }
         }
         else buffer += nextChar;
         getNextChar();
     }
-    if(nextChar == EOF) throw Error(ErrorCode::ErrAssignToConstant,currentPos);
+    if(nextChar == EOF) throw Error(ErrorCode::InvalidStringLiteral,"invalid string literal!",currentPos);
     getNextChar();
     currentState = DFAState::INITIAL_STATE;
     tokens.push_back(Token(TokenType::STRING_LITERAL,buffer,pos,currentPos));
@@ -331,7 +331,7 @@ void Tokenizer::analyseChar()
                 buffer = "\\";
                 break;
             default:
-                throw Error(ErrorCode::ErrAssignToConstant,currentPos);
+                throw Error(ErrorCode::UnknownChar,"invalid escape sequence!",currentPos);
                 break;
             }
     }
@@ -339,7 +339,7 @@ void Tokenizer::analyseChar()
         buffer = "" + nextChar;
     }
     getNextChar();
-    if(nextChar != '\'') throw Error(ErrorCode::ErrAssignToConstant,currentPos);
+    if(nextChar != '\'') throw Error(ErrorCode::InvalidCharLiteral,"invalid char literal!",currentPos);
     getNextChar();
     currentState = DFAState::INITIAL_STATE;
     tokens.push_back(Token(TokenType::CHAR_LITERAL,buffer,pos,currentPos));
