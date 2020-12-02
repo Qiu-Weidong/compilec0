@@ -279,7 +279,7 @@ bool isExpressionTermination(TokenType type)
         || type == TokenType::GT || type == TokenType::GE || type == TokenType::LT || type == TokenType::LE
         || type == TokenType::ASSIGN || type == TokenType::IDENT || type == TokenType::UINT_LITERAL || type == TokenType::CHAR_LITERAL
         || type == TokenType::STRING_LITERAL || type == TokenType::DOUBLE_LITERAL || type == TokenType::L_PAREN
-        || type == TokenType::R_PAREN;
+        || type == TokenType::R_PAREN || type == TokenType::AS_KW || type == TokenType::TY;
 }
 void Analyser::expr()
 {
