@@ -23,6 +23,7 @@ void Analyser::item()
 {
     printf("item\n");
     auto t = peek().getTokenType();
+    printf("%d\n",t);
     if(t == TokenType::FN_KW)
     {
         func();
