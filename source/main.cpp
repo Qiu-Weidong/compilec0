@@ -8,6 +8,17 @@
 int main(int argc, char *argv[])
 {
     Tokenizer tokenizer;
+    std::ofstream fout;
+    fout.open(argv[4]);
+    if(!fout.is_open()) return -1;
+    std::ifstream fin;
+    fin.open("..out.o0");
+    std::string buf;
+    while(std::getline(fin,buf))
+    {
+        fout << buf << std::endl;
+    }
+    return 0;
     try
     {
         tokenizer.analyse(argv[2]);

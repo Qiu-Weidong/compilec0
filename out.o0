@@ -1,0 +1,89 @@
+static: 70 75 74 63 68 61 72 (`putchar`)
+
+static: 70 75 74 63 68 61 72 (`putchar`)
+
+static: 70 75 74 6C 6E (`putln`)
+
+static: 6D 61 69 6E (`main`)
+
+static: 5F 73 74 61 72 74 (`_start`)
+
+
+fn [4] 0 0 -> 0 {
+    0: StackAlloc(0)
+    1: Call(1)
+}
+
+fn [3] 2 0 -> 0 {
+    0: LocA(0)
+    1: Push(0)
+    2: Store64
+    3: Br(0)
+    4: LocA(0)
+    5: Load64
+    6: Push(10)
+    7: CmpI
+    8: SetLt
+    9: BrTrue(1)
+   10: Br(59)
+   11: LocA(1)
+   12: Push(0)
+   13: Store64
+   14: Br(0)
+   15: LocA(1)
+   16: Load64
+   17: Push(9)
+   18: LocA(0)
+   19: Load64
+   20: SubI
+   21: CmpI
+   22: SetLt
+   23: BrTrue(1)
+   24: Br(10)
+   25: StackAlloc(0)
+   26: Push(32)
+   27: CallName(0)
+   28: LocA(1)
+   29: LocA(1)
+   30: Load64
+   31: Push(1)
+   32: AddI
+   33: Store64
+   34: Br(-20)
+   35: LocA(1)
+   36: Push(0)
+   37: Store64
+   38: Br(0)
+   39: LocA(1)
+   40: Load64
+   41: Push(2)
+   42: LocA(0)
+   43: Load64
+   44: MulI
+   45: Push(1)
+   46: AddI
+   47: CmpI
+   48: SetLt
+   49: BrTrue(1)
+   50: Br(10)
+   51: StackAlloc(0)
+   52: Push(42)
+   53: CallName(1)
+   54: LocA(1)
+   55: LocA(1)
+   56: Load64
+   57: Push(1)
+   58: AddI
+   59: Store64
+   60: Br(-22)
+   61: StackAlloc(0)
+   62: CallName(2)
+   63: LocA(0)
+   64: LocA(0)
+   65: Load64
+   66: Push(1)
+   67: AddI
+   68: Store64
+   69: Br(-66)
+   70: Ret
+}
