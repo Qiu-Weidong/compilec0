@@ -12,7 +12,8 @@ int main(int argc, char *argv[])
     fout.open(argv[4]);
     if(!fout.is_open()) return -1;
     std::ifstream fin;
-    fin.open("..out.o0");
+    fin.open("../out.o0");
+    if(!fin.is_open()) return -1;
     std::string buf;
     while(std::getline(fin,buf))
     {
