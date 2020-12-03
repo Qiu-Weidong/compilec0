@@ -92,21 +92,18 @@ public:
     bool isConst() const { return is_const; }
     const std::string & getName() const { return name; }
     Type getType() const { return type; }
+    Kind getKind() const { return kind; }
     int getSize() const { return size; }
     unsigned long long getAddress() const { return address; }
 
-    friend std::ostream & operator<<(std::ostream & os,const Varible & var)
-    {
-        char c = var.is_const ? 1:0;
-        // 是否是常量
-        write(os,(void *)&c,sizeof(c));
-        // 变量的size
-        write(os,(void *)&var.size,sizeof(var.size));
-        long long t = 0;
-        // 用0填充，在_start函数里面去完成赋值
-        write(os,(void *)&t,var.size);
-        return os;
-    }
+    void setConst(bool is_const) { this->is_const = is_const;}
+    void setAddress(int address) { this->address = address; }
+    void setType(Type type) { this->type = type; }
+    void setKind(Kind kind) { this->kind = kind; }
+    void setSize(int size) { this->size = size; }
+    void setName(const std::string & name) { this->name = name; }
+
+    friend std::ostream & operator<<(std::ostream & os,const Varible & var);
 };
 
 //////////////////
@@ -124,16 +121,9 @@ public:
     VaribleTable(VaribleTable * parent = nullptr,int param_offset=0,int loca_offset=0) 
         : parent(parent),param_offset(param_offset),loca_offset(loca_offset) {}
     bool isDeclared(const std::string & var_name);
-    void insert(const Varible & var,const Position & pos);
+    void insert(Varible & var,const Position & pos);
     const Varible & get(const std::string & var_name,const Position & pos);
 
-    friend std::ostream & operator<<(std::ostream & os,const VaribleTable & vr)
-    {
-        int n = vr.table.size();
-        write(os,(void *)&n,sizeof(n));
-        for(const auto & var:vr.table)
-            os << var;
-        return os;
-    }
+    friend std::ostream & operator<<(std::ostream & os,const VaribleTable & vr);
 };
 #endif // VARIBLE_H_
