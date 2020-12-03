@@ -1,6 +1,8 @@
 #ifndef INSTRUCTION_H_
 #define INSTRUCTION_H_
 #include <iostream>
+#include <fstream>
+
 
 ////////////////////
 /// \brief 虚拟机的指令
@@ -119,11 +121,11 @@ private:
 
     friend std::ostream & operator<<(std::ostream & os,const Instruction & i)
     {
-        os << (unsigned char)i.op;
-        if(i.size == 1) os << i.num.u8;
-        else if(i.size == 2) os << i.num.u16;
-        else if(i.size == 4) os << i.num.u32;
-        else if(i.size == 8) os << i.num.f64;
+        os.write((char *)i.op,sizeof(i.op));
+        if(i.size == 1) os.write((char *)&i.num.u8,sizeof(i.num.u8));
+        else if(i.size == 2) os.write((char *)&i.num.u16,sizeof(i.num.u16));
+        else if(i.size == 4) os.write((char *)&i.num.u32,sizeof(i.num.u32));
+        else if(i.size == 8) os.write((char *)&i.num.u64,sizeof(i.num.u64));
         return os;
     }
 };

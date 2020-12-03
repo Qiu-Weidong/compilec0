@@ -4,6 +4,12 @@
 #include "tokenizer.h"
 #include "error.h"
 #include "analyser.h"
+#include "varible.h"
+
+////////////////////
+/// \brief 全局变量的符号表
+////////////////////
+VaribleTable globals;
 
 int main(int argc, char *argv[])
 {

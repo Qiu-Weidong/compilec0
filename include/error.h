@@ -43,6 +43,8 @@ enum ErrorCode : int
     InvalidDeclare,
     ExpectFail,
     invalidStmt,
+    VaribleNotDecl,
+    DuplicateDecl
 };
 
 class Error : public std::exception
