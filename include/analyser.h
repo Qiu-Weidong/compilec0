@@ -2,6 +2,9 @@
 #define ANALYSER_H_
 #include <vector>
 #include "token.h"
+#include "program.h"
+#include "varible.h"
+#include "function.h"
 
 /*
  * 分析

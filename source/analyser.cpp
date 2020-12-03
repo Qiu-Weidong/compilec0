@@ -8,10 +8,23 @@ bool isExpressionTermination(TokenType type);
 //////////////
 void Analyser::program()
 {
-    // printf("program!\n");
     while(has_next())
     {
-        item();
+        // item();
+        auto t = peek().getTokenType();
+        if(t == TokenType::FN_KW)
+        {
+            func();
+        }
+        else if(t == TokenType::LET_KW || t == TokenType::CONST_KW)
+        {
+            decl_stmt();
+        }
+        else
+        {
+             throw Error(ErrorCode::InvalidItem,"invalid item",current().getStart());
+        }
+        
     }
     printf("Accepted!\n");
 }
