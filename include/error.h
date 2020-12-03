@@ -44,7 +44,8 @@ enum ErrorCode : int
     ExpectFail,
     invalidStmt,
     VaribleNotDecl,
-    DuplicateDecl
+    DuplicateDecl,
+    FunctionNotDecl
 };
 
 class Error : public std::exception

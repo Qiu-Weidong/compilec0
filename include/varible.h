@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "position.h"
+#include "output.h"
 
 ////////////////
 /// \brief 变量具体的类型
@@ -67,6 +68,19 @@ public:
     Type getType() const { return type; }
     int getSize() const { return size; }
     unsigned long long getAddress() const { return address; }
+
+    friend std::ostream & operator<<(std::ostream & os,const Varible & var)
+    {
+        char c = var.is_const ? 1:0;
+        // 是否是常量
+        write(os,(void *)&c,sizeof(c));
+        // 变量的size
+        write(os,(void *)&var.size,sizeof(var.size));
+        long long t = 0;
+        // 用0填充，在_start函数里面去完成赋值
+        write(os,(void *)&t,var.size);
+        return os;
+    }
 };
 
 //////////////////
@@ -86,5 +100,14 @@ public:
     bool isDeclared(const std::string & var_name);
     void insert(const Varible & var,const Position & pos);
     const Varible & get(const std::string & var_name,const Position & pos);
+
+    friend std::ostream & operator<<(std::ostream & os,const VaribleTable & vr)
+    {
+        int n = vr.table.size();
+        write(os,(void *)&n,sizeof(n));
+        for(const auto & var:vr.table)
+            os << var;
+        return os;
+    }
 };
 #endif // VARIBLE_H_
