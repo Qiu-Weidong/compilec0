@@ -27,7 +27,9 @@ enum class Kind
     // 函数，可以不要，将函数放在另一张表当中
     FUNC,
     // 变量
-    VAR
+    VAR,
+    // 全局变量
+    GLOBAL
 };
 
 //////////////
@@ -36,14 +38,36 @@ enum class Kind
 class Varible
 {
 private :
+    /////////////
+    /// \brief 是否常量
+    /////////////
     bool is_const;
+
+    /////////////////
+    /// \brief 变量名
+    /////////////////
     std::string name;
+
+    ///////////
+    /// 参数还是普通变量
+    ///////////
     Kind kind;
+
+    //////////
+    /// \brief 数据类型
+    //////////
     Type type;
+
+    //////////
+    /// \brief 数据的size
+    //////////
     int size;
 
     ///////////////////////////
-    /// \brief 地址
+    /// \brief 地址,如果是全部变量，则表示是第几个全局变量
+    ///        如果是函数参数，则表示是该函数的第几个参数
+    ///        如果是局部变量，则表示第几个局部变量
+    ///        可能需要加入符号表中才分配
     ///////////////////////////
     unsigned long long address;
 public:
@@ -53,12 +77,14 @@ public:
     Varible & operator=(const Varible &) = default;
     Varible & operator=(Varible &&) = default;
     ~Varible() = default;
-    Varible(const Type type,const std::string & name,unsigned long long address,bool is_const = false) 
+
+    Varible(const std::string & name,const Kind kind, const Type type,unsigned long long address=0,bool is_const = false) 
     {
         this->type = type;
         this->name = name;
         this->address = address;
         this->is_const = is_const;
+        this->kind = kind;
         if(type == Type::VOID) size = 0;
         else size = 8;
     }
