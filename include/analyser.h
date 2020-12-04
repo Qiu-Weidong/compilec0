@@ -73,11 +73,6 @@ public:
     //////////////
     void program();
 
-    //////////////////
-    /// \brief item -> function | decl_stmt
-    //////////////////
-    // void item();
-
     /////////////////
     /// \brief decl_stmt -> let_decl_stmt | const_decl_stmt
     /////////////////

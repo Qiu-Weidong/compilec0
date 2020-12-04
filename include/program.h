@@ -14,7 +14,7 @@ private:
     FunctionTable functions;
 public:
     Program(unsigned int magic=0x72303b3e,unsigned int version = 0x1): 
-        magic(magic),version(version) { Function _start("_start",Type::VOID);functions.insert(_start,Position(0,0)); }
+        magic(magic),version(version) {  }
     ~Program() = default;
 
     unsigned int getMagic() const { return magic; }
@@ -28,6 +28,15 @@ public:
     const Varible & getGlobal(std::string name,const Position & pos) { return globals.get(name,pos);}
     void addFunction(Function & fn,const Position & pos) { functions.insert(fn,pos); }
     void addGlobal(Varible & var, const Position & pos) { globals.insert(var,pos); } 
+
+    void init() 
+    {
+        if(!functions.isDeclared("_start"))
+        {
+            Function _start("_start",Type::VOID);functions.insert(_start,Position(0,0));
+        }
+    }
+    
     friend std::ostream & operator<<(std::ostream & os, const Program & pg)
     {
         write(os,(void *)&pg.magic,sizeof(pg.magic));

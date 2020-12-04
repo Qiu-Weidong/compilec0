@@ -122,6 +122,7 @@ public:
     const Varible & get(const std::string & var_name,const Position & pos);
 
     bool isGlobalTable() const { return parent == nullptr; }
+    void clear() { table.clear(); }
 
     friend std::ostream & operator<<(std::ostream & os,const VaribleTable & vr);
 };
