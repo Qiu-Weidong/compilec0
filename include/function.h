@@ -7,45 +7,9 @@
 #include "output.h"
 #include "error.h"
 
-//////////////////
-/// \brief 函数的声明
-//////////////////
-class FunctionDecl
-{
-private:
-    /////////
-    /// \brief 给函数分配一个fid
-    /////////
-    int fid;
-
-    //////////////
-    /// \brief 返回类型
-    //////////////
-    Type retType;
-
-    ////////////////
-    /// \brief 函数名
-    ////////////////
-    std::string name;
-
-    ///////////////////////////
-    /// \brief 参数列表，如果有返回值，那么第一个参数的address为返回值的偏移
-    ///        没有返回值，那么第一个参数的address为0，以此类推
-    ///////////////////////////
-    std::vector<Varible> params;
-    
-public:
-    FunctionDecl() = default;
-    FunctionDecl(const FunctionDecl &) = default;
-    FunctionDecl(FunctionDecl &&) = default;
-    FunctionDecl & operator=(const FunctionDecl &) = default;
-    FunctionDecl & operator=(FunctionDecl &&) = default;
-    ~FunctionDecl() = default;
-
-    FunctionDecl(const std::string & name,Type ret_type) : name(name),retType(ret_type) { params.clear(); }
-    void addParam(const Varible & vb) ;
-};
-
+//////////////
+/// \brief 一个表示函数的类
+//////////////
 class Function
 {
 private:
@@ -78,25 +42,22 @@ private:
     //////////////////////
     /// \brief 符号表，每个函数都有自己独立的符号表
     //////////////////////
-    VaribleTable varibles;
+    // VaribleTable varibles;
 
     /////////////////
     /// \brief 函数名称
     /////////////////
     std::string name;
 
-    /////////////////
-    /// \brief 下一个参数地址/偏移
-    /////////////////
-    int next_param_offset;
+    ///////////////////
+    /// \brief 返回值类型
+    ///////////////////
+    Type return_type;
 
-    ////////////////////
-    /// \brief 下一个局部变量的地址/偏移
-    ////////////////////
-    int next_loca_offset;
 public:
-    Function(const std::string & name, int rslots=0,int pslots=0,int lslots=0, VaribleTable * parent=nullptr) 
-        : name(name), return_slots(rslots),param_slots(pslots),loca_slots(lslots),varibles(parent) { fid = -1; }
+    Function() = default;
+    Function(const std::string & name, int rslots=0,int pslots=0,int lslots=0) 
+        : name(name), return_slots(rslots),param_slots(pslots),loca_slots(lslots) { fid = -1; }
     ~Function() = default;
 
     // 全删了
@@ -105,19 +66,22 @@ public:
     Function & operator=(const Function & ) = delete;
     Function & operator=(Function &&) = delete;
 
-    
-    const VaribleTable & getVaribleTable() const { return varibles; }
     const std::vector<Instruction> & getInstructions() const { return instructions; }
     void addInstruction(const Instruction & instruction) { instructions.push_back(instruction); }
     int getReturnSlots() const { return return_slots; }
     int getParamSlots() const { return param_slots; }
     int getLocaSlots() const { return loca_slots; }
     int getFid() const { return fid; }
+    int nextLoca() { return loca_slots++; }
+    int nextParam() { return param_slots++; }
+
     const std::string & getName() const { return name; }
     void setReturnSlots(int rslots) { this->return_slots = rslots; }
     void setParamSlots(int pslots) { this->param_slots = pslots; }
     void setLocaSlots(int lslots) { this->loca_slots = lslots; } 
     void setFid(int fid) { this->fid = fid; }
+
+    void addInstruction(const Instruction & instruction) { instructions.push_back(instruction); }
     
     friend std::ostream & operator<<(std::ostream & os,const Function & f);
 };

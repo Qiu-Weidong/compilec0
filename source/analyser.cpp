@@ -10,24 +10,23 @@ extern Program program;
 
 void Analyser::program()
 {
-    // Function & _start = program.getFunction("_start");
-    while(has_next())
+    // Function & _start = ::program.getFunction("_start");
+    while (has_next())
     {
         // item();
         auto t = peek().getTokenType();
-        if(t == TokenType::FN_KW)
+        if (t == TokenType::FN_KW)
         {
             func();
         }
-        else if(t == TokenType::LET_KW || t == TokenType::CONST_KW)
+        else if (t == TokenType::LET_KW || t == TokenType::CONST_KW)
         {
             decl_stmt();
         }
         else
         {
-             throw Error(ErrorCode::InvalidItem,"invalid item",current().getStart());
+            throw Error(ErrorCode::InvalidItem, "invalid item", current().getStart());
         }
-        
     }
     printf("Accepted!\n");
 }
@@ -39,15 +38,16 @@ void Analyser::item()
 {
     // printf("item\n");
     auto t = peek().getTokenType();
-    if(t == TokenType::FN_KW)
+    if (t == TokenType::FN_KW)
     {
         func();
     }
-    else if(t == TokenType::LET_KW || t == TokenType::CONST_KW)
+    else if (t == TokenType::LET_KW || t == TokenType::CONST_KW)
     {
         decl_stmt();
     }
-    else throw Error(ErrorCode::InvalidItem,"invalid item",current().getStart());
+    else
+        throw Error(ErrorCode::InvalidItem, "invalid item", current().getStart());
 }
 
 /////////////////
@@ -56,15 +56,16 @@ void Analyser::item()
 void Analyser::decl_stmt()
 {
     // printf("decl_stmt\n");
-    if(peek().getTokenType() == TokenType::LET_KW)
+    if (peek().getTokenType() == TokenType::LET_KW)
     {
         let_decl_stmt();
     }
-    else if(peek().getTokenType() == TokenType::CONST_KW)
+    else if (peek().getTokenType() == TokenType::CONST_KW)
     {
         const_decl_stmt();
     }
-    else throw Error(ErrorCode::InvalidDeclare,"invalid Declare!",current().getStart());
+    else
+        throw Error(ErrorCode::InvalidDeclare, "invalid Declare!", current().getStart());
 }
 
 //////////////////
@@ -76,7 +77,7 @@ void Analyser::func()
     expect(TokenType::FN_KW);
     expect(TokenType::IDENT);
     expect(TokenType::L_PAREN);
-    if(peek().getTokenType() != TokenType::R_PAREN)
+    if (peek().getTokenType() != TokenType::R_PAREN)
         func_param_list();
     expect(TokenType::R_PAREN);
     expect(TokenType::ARROW);
@@ -90,7 +91,8 @@ void Analyser::func()
 void Analyser::func_param()
 {
     // printf("func_param\n");
-    if(peek().getTokenType() == TokenType::CONST_KW) next();
+    if (peek().getTokenType() == TokenType::CONST_KW)
+        next();
     expect(TokenType::IDENT);
     expect(TokenType::COLON);
     expect(TokenType::TY);
@@ -103,7 +105,7 @@ void Analyser::func_param_list()
 {
     // printf("func_param_list\n");
     func_param();
-    while(peek().getTokenType() == TokenType::COMMA)
+    while (peek().getTokenType() == TokenType::COMMA)
     {
         next();
         func_param();
@@ -125,16 +127,26 @@ void Analyser::stmt()
 {
     // printf("stmt\n");
     auto type = peek().getTokenType();
-    if(type == TokenType::LET_KW || type == TokenType::CONST_KW) decl_stmt();
-    else if(type == TokenType::IF_KW) if_stmt();
-    else if(type == TokenType::WHILE_KW) while_stmt();
-    else if(type == TokenType::BREAK_KW) break_stmt();
-    else if(type == TokenType::CONTINUE_KW) continue_stmt();
-    else if(type == TokenType::RETURN_KW) return_stmt();
-    else if(type == TokenType::L_BRACE) block_stmt();
-    else if(type == TokenType::SEMICOLON) empty_stmt();
-    else if(isExpressionTermination(type)) expr();
-    else throw Error(ErrorCode::invalidStmt,"invalid stmt",current().getStart());
+    if (type == TokenType::LET_KW || type == TokenType::CONST_KW)
+        decl_stmt();
+    else if (type == TokenType::IF_KW)
+        if_stmt();
+    else if (type == TokenType::WHILE_KW)
+        while_stmt();
+    else if (type == TokenType::BREAK_KW)
+        break_stmt();
+    else if (type == TokenType::CONTINUE_KW)
+        continue_stmt();
+    else if (type == TokenType::RETURN_KW)
+        return_stmt();
+    else if (type == TokenType::L_BRACE)
+        block_stmt();
+    else if (type == TokenType::SEMICOLON)
+        empty_stmt();
+    else if (isExpressionTermination(type))
+        expr();
+    else
+        throw Error(ErrorCode::invalidStmt, "invalid stmt", current().getStart());
 }
 
 ////////////////////
@@ -153,7 +165,7 @@ void Analyser::block_stmt()
 {
     // printf("block_stmt\n");
     expect(TokenType::L_BRACE);
-    while(has_next() && peek().getTokenType() != TokenType::R_BRACE)
+    while (has_next() && peek().getTokenType() != TokenType::R_BRACE)
         stmt();
     expect(TokenType::R_BRACE);
 }
@@ -209,16 +221,17 @@ void Analyser::if_stmt()
     expect(TokenType::IF_KW);
     expr();
     block_stmt();
-    while(peek().getTokenType() == TokenType::ELSE_KW)
+    while (peek().getTokenType() == TokenType::ELSE_KW)
     {
         next();
-        if(peek().getTokenType() == TokenType::IF_KW)
+        if (peek().getTokenType() == TokenType::IF_KW)
         {
             next();
             expr();
             block_stmt();
         }
-        else {
+        else
+        {
             block_stmt();
             break;
         }
@@ -235,7 +248,8 @@ void Analyser::const_decl_stmt()
     expect(TokenType::IDENT);
     expect(TokenType::COLON);
     expect(TokenType::TY);
-    if(current().getValue() == "void") throw Error(ErrorCode::InvalidDeclare,"variant can\'t be \'void\'!",current().getStart());
+    if (current().getValue() == "void")
+        throw Error(ErrorCode::InvalidDeclare, "variant can\'t be \'void\'!", current().getStart());
     expect(TokenType::ASSIGN);
     expr();
     expect(TokenType::SEMICOLON);
@@ -251,8 +265,9 @@ void Analyser::let_decl_stmt()
     expect(TokenType::IDENT);
     expect(TokenType::COLON);
     expect(TokenType::TY);
-    if(current().getValue() == "void") throw Error(ErrorCode::InvalidDeclare,"variant can\'t be \'void\'!",current().getStart());
-    if(peek().getTokenType() == TokenType::ASSIGN)
+    if (current().getValue() == "void")
+        throw Error(ErrorCode::InvalidDeclare, "variant can\'t be \'void\'!", current().getStart());
+    if (peek().getTokenType() == TokenType::ASSIGN)
     {
         next();
         expr();
@@ -291,11 +306,7 @@ void Analyser::expr_stmt()
 bool isExpressionTermination(TokenType type)
 {
     return type == TokenType::PLUS || type == TokenType::MINUS || type == TokenType::MUL ||
-        type == TokenType::COMMA || type == TokenType::DIV || type == TokenType::EQ || type == TokenType::NEQ
-        || type == TokenType::GT || type == TokenType::GE || type == TokenType::LT || type == TokenType::LE
-        || type == TokenType::ASSIGN || type == TokenType::IDENT || type == TokenType::UINT_LITERAL || type == TokenType::CHAR_LITERAL
-        || type == TokenType::STRING_LITERAL || type == TokenType::DOUBLE_LITERAL || type == TokenType::L_PAREN
-        || type == TokenType::R_PAREN || type == TokenType::AS_KW || type == TokenType::TY;
+           type == TokenType::COMMA || type == TokenType::DIV || type == TokenType::EQ || type == TokenType::NEQ || type == TokenType::GT || type == TokenType::GE || type == TokenType::LT || type == TokenType::LE || type == TokenType::ASSIGN || type == TokenType::IDENT || type == TokenType::UINT_LITERAL || type == TokenType::CHAR_LITERAL || type == TokenType::STRING_LITERAL || type == TokenType::DOUBLE_LITERAL || type == TokenType::L_PAREN || type == TokenType::R_PAREN || type == TokenType::AS_KW || type == TokenType::TY;
 }
 void Analyser::expr()
 {
@@ -303,7 +314,7 @@ void Analyser::expr()
     // auto t = peek().getTokenType();
     // if(t == TokenType::MINUS) negate_expr();
     // else if(t == TokenType::L_PAREN) group_expr();
-    while(has_next() && isExpressionTermination(peek().getTokenType()))
+    while (has_next() && isExpressionTermination(peek().getTokenType()))
         next();
 }
 
@@ -353,7 +364,7 @@ void Analyser::call_param_list()
 {
     // printf("call_param_list\n");
     expr();
-    while(peek().getTokenType() == TokenType::COMMA)
+    while (peek().getTokenType() == TokenType::COMMA)
     {
         next();
         expr();
@@ -379,9 +390,9 @@ void Analyser::literal_expr()
 {
     // printf("literal_expr\n");
     auto t = peek().getTokenType();
-    if(t != TokenType::UINT_LITERAL && t != TokenType::STRING_LITERAL &&
+    if (t != TokenType::UINT_LITERAL && t != TokenType::STRING_LITERAL &&
         t != TokenType::DOUBLE_LITERAL && t != TokenType::CHAR_LITERAL)
-        throw Error(ErrorCode::ExpectFail,"expect literal!",current().getStart());
+        throw Error(ErrorCode::ExpectFail, "expect literal!", current().getStart());
     next();
 }
 
@@ -414,31 +425,32 @@ void Analyser::l_expr()
     expect(TokenType::IDENT);
 }
 
-const Token & Analyser::peek() const
+const Token &Analyser::peek() const
 {
-    return tokens[index+1];
+    return tokens[index + 1];
 }
 
-const Token & Analyser::next()
+const Token &Analyser::next()
 {
     index++;
     return tokens[index];
 }
-const Token & Analyser::current() const
+const Token &Analyser::current() const
 {
     return tokens[index];
 }
-const Token & Analyser::previous() 
+const Token &Analyser::previous()
 {
-    if(index <= 0) throw Error(ErrorCode::NoToken,"there is no previous token!");
+    if (index <= 0)
+        throw Error(ErrorCode::NoToken, "there is no previous token!");
     index--;
     return tokens[index];
 }
 void Analyser::expect(TokenType type)
 {
-    if(!has_next()) throw Error(ErrorCode::NoToken,"there is no token anymore!",sentinel.getStart());
+    if (!has_next())
+        throw Error(ErrorCode::NoToken, "there is no token anymore!", sentinel.getStart());
     index++;
-    if(tokens[index].getTokenType() != type)
-        throw Error(ErrorCode::ExpectFail,"expect fail",current().getStart());
-    
+    if (tokens[index].getTokenType() != type)
+        throw Error(ErrorCode::ExpectFail, "expect fail", current().getStart());
 }
