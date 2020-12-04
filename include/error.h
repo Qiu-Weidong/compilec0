@@ -45,7 +45,8 @@ enum ErrorCode : int
     invalidStmt,
     VaribleNotDecl,
     DuplicateDecl,
-    FunctionNotDecl
+    FunctionNotDecl,
+    InvalidType
 };
 
 class Error : public std::exception

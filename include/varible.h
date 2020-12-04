@@ -121,6 +121,8 @@ public:
     void insert(const Varible & var,const Position & pos);
     const Varible & get(const std::string & var_name,const Position & pos);
 
+    bool isGlobalTable() const { return parent == nullptr; }
+
     friend std::ostream & operator<<(std::ostream & os,const VaribleTable & vr);
 };
 #endif // VARIBLE_H_

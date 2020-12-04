@@ -56,33 +56,35 @@ private:
 
 public:
     Function() = default;
-    Function(const std::string & name, int rslots=0,int pslots=0,int lslots=0) 
-        : name(name), return_slots(rslots),param_slots(pslots),loca_slots(lslots) { fid = -1; }
+    Function(const std::string & name,Type return_type, int rslots=0,int pslots=0,int lslots=0) 
+        : name(name), return_type(return_type), return_slots(rslots),param_slots(pslots),loca_slots(lslots) { fid = -1; }
     ~Function() = default;
 
-    // 全删了
-    Function(const Function &) = delete;
-    Function(Function &&) = delete;
-    Function & operator=(const Function & ) = delete;
-    Function & operator=(Function &&) = delete;
+    Function(const Function &) = default;
+    Function(Function &&) = default;
+    Function & operator=(const Function & ) = default;
+    Function & operator=(Function &&) = default;
 
+    // get
     const std::vector<Instruction> & getInstructions() const { return instructions; }
-    void addInstruction(const Instruction & instruction) { instructions.push_back(instruction); }
     int getReturnSlots() const { return return_slots; }
     int getParamSlots() const { return param_slots; }
     int getLocaSlots() const { return loca_slots; }
     int getFid() const { return fid; }
     int nextLoca() { return loca_slots++; }
-    int nextParam() { return param_slots++; }
-
     const std::string & getName() const { return name; }
+    Type getReturnType() const { return return_type; }
+
+    // set
+    void setName(const std::string & name) { this->name = name; }
     void setReturnSlots(int rslots) { this->return_slots = rslots; }
     void setParamSlots(int pslots) { this->param_slots = pslots; }
     void setLocaSlots(int lslots) { this->loca_slots = lslots; } 
     void setFid(int fid) { this->fid = fid; }
-
+    void setReturnType(Type type) { this->return_type = type; }
     void addInstruction(const Instruction & instruction) { instructions.push_back(instruction); }
     
+    // output
     friend std::ostream & operator<<(std::ostream & os,const Function & f);
 };
 
@@ -94,11 +96,10 @@ private:
 public:
     FunctionTable() { next_fid = 0; }
     ~FunctionTable() = default;
-    // 全删了
-    FunctionTable(const FunctionTable &) = delete;
-    FunctionTable(FunctionTable &&) = delete;
-    FunctionTable & operator=(const FunctionTable &) = delete;
-    FunctionTable & operator=(FunctionTable && ) = delete;
+    FunctionTable(const FunctionTable &) = default;
+    FunctionTable(FunctionTable &&) = default;
+    FunctionTable & operator=(const FunctionTable &) = default;
+    FunctionTable & operator=(FunctionTable && ) = default;
 
     bool isDeclared(const std::string & name);
     void insert(Function & fn, const Position & pos);

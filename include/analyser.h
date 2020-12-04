@@ -49,7 +49,7 @@ private:
     const Token & next() ;
     const Token & current() const;
     const Token & previous();
-    void expect(TokenType type) ;
+    const Token & expect(TokenType type) ;
     bool has_next() const 
     {
         if(index+1 >= tokens.size()) return false;
@@ -76,17 +76,17 @@ public:
     //////////////////
     /// \brief item -> function | decl_stmt
     //////////////////
-    void item();
+    // void item();
 
     /////////////////
     /// \brief decl_stmt -> let_decl_stmt | const_decl_stmt
     /////////////////
-    void decl_stmt();
+    void decl_stmt(VaribleTable & vt,Function & fn);
 
     //////////////////
     /// \brief function -> 'fn' IDENT '(' function_param_list? ')' '->' ty block_stmt
     //////////////////
-    void func();
+    Function func(VaribleTable &);
 
     /////////////////////
     /// \brief function_param -> 'const'? IDENT ':' ty
@@ -141,12 +141,12 @@ public:
     //////////////////////
     /// \brief const_decl_stmt -> 'const' IDENT ':' ty '=' expr ';'
     //////////////////////
-    void const_decl_stmt();
+    void const_decl_stmt(VaribleTable & vt,Function & fn);
 
     //////////////////////
     /// \brief let_decl_stmt -> 'let' IDENT ':' ty ('=' expr)? ';'
     //////////////////////
-    void let_decl_stmt();
+    void let_decl_stmt(VaribleTable & vt,Function & fn);
 
     /////////////////
     /// \brief expr_stmt -> expr ';'

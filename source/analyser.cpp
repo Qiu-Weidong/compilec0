@@ -10,18 +10,19 @@ extern Program program;
 
 void Analyser::program()
 {
-    // Function & _start = ::program.getFunction("_start");
+    auto & _start = ::program.getFunction("_start",current().getStart());
+    auto & globals = ::program.getGlobals();
+
     while (has_next())
     {
-        // item();
         auto t = peek().getTokenType();
         if (t == TokenType::FN_KW)
         {
-            func();
+            func(globals);
         }
         else if (t == TokenType::LET_KW || t == TokenType::CONST_KW)
         {
-            decl_stmt();
+            decl_stmt(globals,_start);
         }
         else
         {
@@ -31,38 +32,19 @@ void Analyser::program()
     printf("Accepted!\n");
 }
 
-//////////////////
-/// \brief item -> function | decl_stmt
-//////////////////
-void Analyser::item()
-{
-    // printf("item\n");
-    auto t = peek().getTokenType();
-    if (t == TokenType::FN_KW)
-    {
-        func();
-    }
-    else if (t == TokenType::LET_KW || t == TokenType::CONST_KW)
-    {
-        decl_stmt();
-    }
-    else
-        throw Error(ErrorCode::InvalidItem, "invalid item", current().getStart());
-}
-
 /////////////////
 /// \brief decl_stmt -> let_decl_stmt | const_decl_stmt
 /////////////////
-void Analyser::decl_stmt()
+void Analyser::decl_stmt(VaribleTable & vt,Function & fn)
 {
     // printf("decl_stmt\n");
     if (peek().getTokenType() == TokenType::LET_KW)
     {
-        let_decl_stmt();
+        let_decl_stmt(vt,fn);
     }
     else if (peek().getTokenType() == TokenType::CONST_KW)
     {
-        const_decl_stmt();
+        const_decl_stmt(vt,fn);
     }
     else
         throw Error(ErrorCode::InvalidDeclare, "invalid Declare!", current().getStart());
@@ -71,11 +53,12 @@ void Analyser::decl_stmt()
 //////////////////
 /// \brief function -> 'fn' IDENT '(' function_param_list? ')' '->' ty block_stmt
 //////////////////
-void Analyser::func()
+Function Analyser::func(VaribleTable & parent)
 {
-    // printf("func\n");
+    Function fn;
+    VaribleTable vt(&parent);
     expect(TokenType::FN_KW);
-    expect(TokenType::IDENT);
+    fn.setName(expect(TokenType::IDENT).getValue());
     expect(TokenType::L_PAREN);
     if (peek().getTokenType() != TokenType::R_PAREN)
         func_param_list();
@@ -126,9 +109,11 @@ void Analyser::func_param_list()
 void Analyser::stmt()
 {
     // printf("stmt\n");
+    VaribleTable vt;
+    Function fn;
     auto type = peek().getTokenType();
     if (type == TokenType::LET_KW || type == TokenType::CONST_KW)
-        decl_stmt();
+        decl_stmt(vt,fn);
     else if (type == TokenType::IF_KW)
         if_stmt();
     else if (type == TokenType::WHILE_KW)
@@ -241,7 +226,7 @@ void Analyser::if_stmt()
 //////////////////////
 /// \brief const_decl_stmt -> 'const' IDENT ':' ty '=' expr ';'
 //////////////////////
-void Analyser::const_decl_stmt()
+void Analyser::const_decl_stmt(VaribleTable & vt,Function & fn)
 {
     // printf("const_decl_stmt\n");
     expect(TokenType::CONST_KW);
@@ -258,19 +243,34 @@ void Analyser::const_decl_stmt()
 //////////////////////
 /// \brief let_decl_stmt -> 'let' IDENT ':' ty ('=' expr)? ';'
 //////////////////////
-void Analyser::let_decl_stmt()
+void Analyser::let_decl_stmt(VaribleTable & vt,Function & fn)
 {
-    // printf("let_decl_stmt\n");
+    Varible var;
     expect(TokenType::LET_KW);
-    expect(TokenType::IDENT);
+    var.setName(expect(TokenType::IDENT).getValue());
     expect(TokenType::COLON);
     expect(TokenType::TY);
     if (current().getValue() == "void")
         throw Error(ErrorCode::InvalidDeclare, "variant can\'t be \'void\'!", current().getStart());
+    else if(current().getValue() == "int") var.setType(Type::INT);
+    else if(current().getValue() == "double") var.setType(Type::DOUBLE);
+    else throw Error(ErrorCode::InvalidType,"No such type",current().getStart());
+    var.setConst(false);
+    if(vt.isGlobalTable()) var.setKind(Kind::GLOBAL);
+    else var.setKind(Kind::VAR);
+    var.setAddress(fn.nextLoca());
+    var.setSize(8);
+    vt.insert(var,current().getStart());
     if (peek().getTokenType() == TokenType::ASSIGN)
     {
         next();
+        if(var.getKind() == Kind::GLOBAL)
+        fn.addInstruction(Instruction(Operation::GLOBA,(int)var.getAddress()));
+        else if(var.getKind() == Kind::VAR)
+        fn.addInstruction(Instruction(Operation::ARGA,(int)var.getAddress()));
+        // expr生成一系列指令，执行完成后，结果在栈顶
         expr();
+        fn.addInstruction(Instruction(Operation::STORE_64));
     }
     expect(TokenType::SEMICOLON);
 }
@@ -446,11 +446,12 @@ const Token &Analyser::previous()
     index--;
     return tokens[index];
 }
-void Analyser::expect(TokenType type)
+const Token & Analyser::expect(TokenType type)
 {
     if (!has_next())
         throw Error(ErrorCode::NoToken, "there is no token anymore!", sentinel.getStart());
     index++;
     if (tokens[index].getTokenType() != type)
         throw Error(ErrorCode::ExpectFail, "expect fail", current().getStart());
+    return tokens[index];
 }

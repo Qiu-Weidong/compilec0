@@ -101,7 +101,7 @@ private:
         long long u64;
         double f64;
     }num;
-    
+public:
     Instruction() = default;
     Instruction(const Instruction &) = default;
     Instruction(Instruction &&) = default;
