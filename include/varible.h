@@ -114,14 +114,11 @@ class VaribleTable
 private:
     VaribleTable * parent;
     std::vector<Varible> table;
-    // 可以假想存在两个栈，返回值和参数放在一个栈中，局部变量放在另一个
-    int param_offset; // 下一个参数的偏移
-    int loca_offset; // 下一个局部变量的偏移
 public:
-    VaribleTable(VaribleTable * parent = nullptr,int param_offset=0,int loca_offset=0) 
-        : parent(parent),param_offset(param_offset),loca_offset(loca_offset) {}
+    VaribleTable(VaribleTable * parent = nullptr) 
+        : parent(parent) {}
     bool isDeclared(const std::string & var_name);
-    void insert(Varible & var,const Position & pos);
+    void insert(const Varible & var,const Position & pos);
     const Varible & get(const std::string & var_name,const Position & pos);
 
     friend std::ostream & operator<<(std::ostream & os,const VaribleTable & vr);

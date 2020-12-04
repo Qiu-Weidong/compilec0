@@ -84,6 +84,16 @@ private:
     /// \brief 函数名称
     /////////////////
     std::string name;
+
+    /////////////////
+    /// \brief 下一个参数地址/偏移
+    /////////////////
+    int next_param_offset;
+
+    ////////////////////
+    /// \brief 下一个局部变量的地址/偏移
+    ////////////////////
+    int next_loca_offset;
 public:
     Function(const std::string & name, int rslots=0,int pslots=0,int lslots=0, VaribleTable * parent=nullptr) 
         : name(name), return_slots(rslots),param_slots(pslots),loca_slots(lslots),varibles(parent) { fid = -1; }
@@ -129,6 +139,7 @@ public:
     bool isDeclared(const std::string & name);
     void insert(Function & fn, const Position & pos);
     Function & get(const std::string & name,const Position & pos);
+    Function & get(int fid,const Position & pos);
 
     friend std::ostream & operator<<(std::ostream & os,const FunctionTable & ft);
 };

@@ -40,6 +40,14 @@ Function &FunctionTable::get(const std::string &name, const Position &pos)
     throw Error(ErrorCode::FunctionNotDecl, "function \"" + name + "\" is not declared!", pos);
 }
 
+Function & FunctionTable::get(int fid,const Position & pos)
+{
+    for(auto & fn : functions)
+    {
+        if(fn.getFid() == fid) return fn;
+    }
+    throw Error(ErrorCode::FunctionNotDecl,"function "+std::to_string(fid)+" is not declared!",pos);
+}
 std::ostream &operator<<(std::ostream &os, const FunctionTable &ft)
 {
     int n = ft.functions.size();

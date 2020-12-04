@@ -21,14 +21,10 @@ const Varible &VaribleTable::get(const std::string &name, const Position &pos)
         throw Error(ErrorCode::VaribleNotDecl, "varible \"" + name + "\" is not declared!", pos);
     return parent->get(name, pos);
 }
-void VaribleTable::insert(Varible &var, const Position &pos)
+void VaribleTable::insert(const Varible &var, const Position &pos)
 {
     if (isDeclared(var.getName()))
         throw Error(ErrorCode::DuplicateDecl, "varible \"" + var.getName() + "\" is duplicate declared!", pos);
-    if (var.getKind() == Kind::PARAM)
-        var.setAddress(param_offset++);
-    else
-        var.setAddress(loca_offset++);
     table.push_back(var);
 }
 

@@ -6,8 +6,11 @@ bool isExpressionTermination(TokenType type);
 //////////////
 /// \brief program -> item*
 //////////////
+extern Program program;
+
 void Analyser::program()
 {
+    // Function & _start = program.getFunction("_start");
     while(has_next())
     {
         // item();
