@@ -49,6 +49,11 @@ private:
     ///////////////////
     Type return_type;
 
+    ///////////////////////////////
+    /// \brief 参数类型列表
+    ///////////////////////////////
+    std::vector<Type> param_types;
+
 public:
     Function() = default;
     Function(const std::string & name,Type return_type, int rslots=0,int pslots=0,int lslots=0) 
@@ -69,6 +74,7 @@ public:
     int nextLoca() { return loca_slots++; }
     const std::string & getName() const { return name; }
     Type getReturnType() const { return return_type; }
+    const std::vector<Type> & getParamTypes() const { return param_types; }
 
     // set
     void setName(const std::string & name) { this->name = name; }
@@ -78,7 +84,7 @@ public:
     void setFid(int fid) { this->fid = fid; }
     void setReturnType(Type type) { this->return_type = type; }
     void addInstruction(const Instruction & instruction) { instructions.push_back(instruction); }
-    
+    void addParamType(Type type) { this->param_types.push_back(type),this->param_slots++; }
     // output
     friend std::ostream & operator<<(std::ostream & os,const Function & f);
 };

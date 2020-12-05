@@ -17,7 +17,8 @@ enum class Type
     // 浮点型
     DOUBLE,
     // 字符串
-    STRING
+    STRING,
+    BOOL
 };
 ///////////////
 /// \brief 符号表的条目类型，

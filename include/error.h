@@ -50,7 +50,11 @@ enum ErrorCode : int
     ConstMustBeInitial,
     TypeNotMatch,
     ConstValueChanged,
-    InvalidAssign
+    InvalidAssign,
+    ParamNotMatch,
+    ParamNotEnough,
+    InvalidCallList,
+    BadExpr,
 };
 
 class Error : public std::exception

@@ -38,8 +38,8 @@ void Analyser::func(VaribleTable &parent, FunctionTable &ft)
             params[i].setAddress(i+1);
     }
     else throw Error(ErrorCode::InvalidType,"function \""+name+"\" return a invalid type!",current().getStart());
-    fn.setParamSlots(params.size());
-    for(auto & param : params) vt.insert(param,current().getStart());
+    // fn.setParamSlots(params.size());
+    for(auto & param : params) {vt.insert(param,current().getStart()); fn.addParamType(param.getType());}
     block_stmt(vt,ft,fn);
     ft.insert(fn,current().getStart());
 }

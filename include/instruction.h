@@ -99,6 +99,7 @@ private:
         unsigned long long u64;
         int i32;
         long long i64;
+        double f64;
     }num;
 public:
     ////////////////////////////
@@ -119,6 +120,7 @@ public:
     Instruction(Operation op,unsigned long long u64) : op(op),size(8) { this->num.u64 = u64; }
     Instruction(Operation op,int i32) : op(op),size(4) { this->num.i32 = i32; }
     Instruction(Operation op,long long i64) : op(op),size(8) { this->num.i64; }
+    Instruction(Operation op,double f64) : op(op),size(8) { this->num.f64 = f64; }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief 用于输出的友元函数

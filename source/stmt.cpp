@@ -83,7 +83,12 @@ void Analyser::continue_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
 void Analyser::return_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {
     expect(TokenType::RETURN_KW);
+    if(fn.getReturnType() != Type::VOID)
+        fn.addInstruction(Instruction(Operation::ARGA,0));
     if(expr(vt,ft,fn) != fn.getReturnType()) throw Error(ErrorCode::TypeNotMatch,"function return error type!",current().getStart());
+    if(fn.getReturnType() != Type::VOID)
+        fn.addInstruction(Instruction(Operation::STORE_64));
+    fn.addInstruction(Instruction(Operation::RET));
     expect(TokenType::SEMICOLON);
 }
 void Analyser::empty_stmt()// 可以不要
