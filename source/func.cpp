@@ -8,8 +8,10 @@ void Analyser::func(VaribleTable &parent, FunctionTable &ft)
     expect(TokenType::FN_KW);
     auto & name = expect(TokenType::IDENT).getValue();
     if(ft.isDeclared(name)) throw Error(ErrorCode::DuplicateDecl,"function \""+name+"\" is duplicate declared!");
+    fn.setName(name);
     expect(TokenType::L_PAREN);
     std::vector<Varible> params;
+    params.clear();
     if (peek().getTokenType() != TokenType::R_PAREN)
         params = func_param_list();
     expect(TokenType::R_PAREN);
@@ -38,9 +40,14 @@ void Analyser::func(VaribleTable &parent, FunctionTable &ft)
             params[i].setAddress(i+1);
     }
     else throw Error(ErrorCode::InvalidType,"function \""+name+"\" return a invalid type!",current().getStart());
-    // fn.setParamSlots(params.size());
+
     for(auto & param : params) {vt.insert(param,current().getStart()); fn.addParamType(param.getType());}
     block_stmt(vt,ft,fn);
+#ifdef DEBUG
+    std::cout << fn << std::endl;
+    printf("fuck!\n");
+#endif // DEBUG
+    
     ft.insert(fn,current().getStart());
 }
 Varible Analyser::func_param()
@@ -72,4 +79,5 @@ std::vector<Varible> Analyser::func_param_list()
         next();
         ret.push_back(func_param());
     }
+    return ret;
 }

@@ -1,6 +1,7 @@
 #ifndef OUTPUT_H_
 #define OUTPUT_H_
 #include <fstream>
+// #define DEBUG
 
 ///////////////////
 /// \brief 检查机器是大端序还是小端序

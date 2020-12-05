@@ -1,5 +1,6 @@
 #include "function.h"
 
+#ifndef DEBUG
 std::ostream &operator<<(std::ostream &os, const Function &f)
 {
     write(os, (void *)&f.fid, sizeof(f.fid));
@@ -12,7 +13,18 @@ std::ostream &operator<<(std::ostream &os, const Function &f)
         os << instruction;
     return os;
 }
-
+#else
+std::ostream & operator<<(std::ostream & os,const Function & f)
+{
+    os << "fid:         " << f.fid << std::endl;
+    os << "return_slots:" << f.return_slots << std::endl;
+    os << "param_slots: " << f.param_slots << std::endl;
+    os << "loca_slots:  " << f.loca_slots << std::endl;
+    os << "instructions:" << f.instructions.size() << std::endl;
+    for(const auto & instruction:f.instructions) os << instruction ;
+    return os;
+}
+#endif // DEBUG
 bool FunctionTable::isDeclared(const std::string &name)
 {
     for (const auto &fn : functions)
@@ -49,6 +61,8 @@ Function & FunctionTable::get(int fid,const Position & pos)
     }
     throw Error(ErrorCode::FunctionNotDecl,"function "+std::to_string(fid)+" is not declared!",pos);
 }
+
+#ifndef DEBUG
 std::ostream &operator<<(std::ostream &os, const FunctionTable &ft)
 {
     int n = ft.functions.size();
@@ -57,3 +71,11 @@ std::ostream &operator<<(std::ostream &os, const FunctionTable &ft)
         os << fn;
     return os;
 }
+#else
+std::ostream & operator<<(std::ostream & os,const FunctionTable & ft)
+{
+    os << "fn counts: "<<ft.functions.size() << std::endl;
+    for(const auto & fn : ft.functions) os << fn << std::endl;
+    return os;
+}
+#endif // DEBUG

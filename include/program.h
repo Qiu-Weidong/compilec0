@@ -12,6 +12,7 @@ private:
     unsigned int version;
     VaribleTable globals;
     FunctionTable functions;
+    Function _start;
 public:
     Program(unsigned int magic=0x72303b3e,unsigned int version = 0x1): 
         magic(magic),version(version) {  }
@@ -30,17 +31,21 @@ public:
     void addGlobal(Varible & var, const Position & pos) { globals.insert(var,pos); } 
 
     /////////////
-    /// \brief 将_start函数添加到函数列表当中
+    /// \brief 初始化_start函数
     /////////////
     void init() 
     {
-        if(!functions.isDeclared("_start"))
-        {
-            Function _start("_start",Type::VOID);
-            functions.insert(_start,Position(0,0));
-        }
+        _start.setFid(0);
+        _start.setLocaSlots(0);
+        _start.setParamSlots(0);
+        _start.setReturnSlots(0);
+        _start.setReturnType(Type::VOID);
+        _start.setName("_start");
     }
-    
+
+    Function & get_start() { return _start; }
+
+#ifndef DEBUG
     friend std::ostream & operator<<(std::ostream & os, const Program & pg)
     {
         write(os,(void *)&pg.magic,sizeof(pg.magic));
@@ -49,6 +54,17 @@ public:
         os << pg.functions;
         return os;
     }
+#else 
+    friend std::ostream & operator<<(std::ostream & os,const Program & pg)
+    {
+        os << "magic:  " << pg.magic << std::endl;
+        os << "version:" <<pg.version << std::endl;
+        os << pg.globals << std::endl;
+        os << pg._start << std::endl;
+        os << pg.functions << std::endl;
+        return os;
+    }
+#endif //DEBUG
 };
 
 

@@ -46,9 +46,9 @@ bool Analyser::has_previous() const { return index > 0; }
 
 void Analyser::program(Program & pg)
 {
-    // 在函数列表当中添加一个_start函数
+    // 初始化_start函数
     pg.init();
-    Function & _start = pg.getFunction("_start",current().getStart());
+    Function & _start = pg.get_start();
     VaribleTable & globals = pg.getGlobals();
     FunctionTable & ft = pg.getFunctions();
     while(has_next())

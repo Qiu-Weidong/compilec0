@@ -29,6 +29,7 @@ void VaribleTable::insert(const Varible &var, const Position &pos)
     table.push_back(var);
 }
 
+#ifndef DEBUG
 std::ostream &operator<<(std::ostream &os, const VaribleTable &vr)
 {
     int n = vr.table.size();
@@ -61,3 +62,27 @@ std::ostream &operator<<(std::ostream &os, const Varible &var)
     }
     return os;
 }
+#else
+std::ostream & operator<<(std::ostream & os,const Varible & var)
+{
+    assert(var.kind == Kind::GLOBAL);
+    if(var.type == Type::STRING) assert(var.name.size() == var.size);
+    os << "is const: " << var.is_const << std::endl;
+    os << "size:     " << var.size << std::endl;
+    if(var.type == Type::STRING) os << var.name;
+    else {
+        for(int i=0;i<var.size;i++)
+            os << "00 " ;
+        os << std::endl;
+    }
+    return os;
+
+}
+
+std::ostream & operator<<(std::ostream & os,const VaribleTable & vt)
+{
+    os << "global counts: "<< vt.table.size();
+    for(const auto & var : vt.table) os << var;
+    return os;
+}
+#endif // DEBUG

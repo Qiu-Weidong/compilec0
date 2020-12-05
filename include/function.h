@@ -55,7 +55,17 @@ private:
     std::vector<Type> param_types;
 
 public:
-    Function() = default;
+    Function() 
+    {
+        this->fid = 0;
+        this->name = "";
+        this->return_slots = 0;
+        this->return_type = Type::VOID;
+        this->param_slots = 0;
+        this->loca_slots = 0;
+        instructions.clear();
+        param_types.clear();
+    };
     Function(const std::string & name,Type return_type, int rslots=0,int pslots=0,int lslots=0) 
         : name(name), return_type(return_type), return_slots(rslots),param_slots(pslots),loca_slots(lslots) { fid = -1; }
     ~Function() = default;
@@ -95,7 +105,7 @@ private:
     int next_fid; // 下一个分配的fid
     std::vector<Function> functions;
 public:
-    FunctionTable() { next_fid = 0; }
+    FunctionTable() { next_fid = 1; }
     ~FunctionTable() = default;
     FunctionTable(const FunctionTable &) = default;
     FunctionTable(FunctionTable &&) = default;

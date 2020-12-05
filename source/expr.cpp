@@ -43,7 +43,7 @@ bool less(TokenType a, TokenType b);
 
 Type Analyser::expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {
-    if (isExpressionTermination(peek().getTokenType()))
+    if (!isExpressionTermination(peek().getTokenType()))
         return Type::VOID;
     // 建立两个栈，一个用于符号，另一个用于保存类型
     TokenType op[100];
@@ -139,7 +139,7 @@ Type Analyser::expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
             }
         }
     }
-    while (!less(op[t_op - 1], TokenType::NONE))
+    while (op[t_op-1]!=TokenType::NONE)
     {
         if (ty[t_ty - 1] != ty[t_ty - 2])
             throw Error(ErrorCode::TypeNotMatch, "type does not match!", current().getStart());
@@ -161,7 +161,7 @@ Type Analyser::operator_expr(Type t, TokenType op, Function &fn)
             fn.addInstruction(Instruction(Operation::ADD_F));
         else
             throw Error(ErrorCode::BadExpr, "can\'t add!", current().getStart());
-        break;
+        return t;
     }
     case TokenType::MINUS:
     {
@@ -171,7 +171,7 @@ Type Analyser::operator_expr(Type t, TokenType op, Function &fn)
             fn.addInstruction(Instruction(Operation::SUB_F));
         else
             throw Error(ErrorCode::BadExpr, "can\'t sub!", current().getStart());
-        break;
+        return t;
     }
     case TokenType::MUL:
     {
@@ -181,7 +181,7 @@ Type Analyser::operator_expr(Type t, TokenType op, Function &fn)
             fn.addInstruction(Instruction(Operation::MUL_F));
         else
             throw Error(ErrorCode::BadExpr, "can\'t mul!", current().getStart());
-        break;
+        return t;
     }
     case TokenType::DIV:
     {
@@ -191,7 +191,7 @@ Type Analyser::operator_expr(Type t, TokenType op, Function &fn)
             fn.addInstruction(Instruction(Operation::DIV_F));
         else
             throw Error(ErrorCode::BadExpr, "can\'t div!", current().getStart());
-        break;
+        return t;
     }
     case TokenType::LE:
     {
@@ -203,7 +203,7 @@ Type Analyser::operator_expr(Type t, TokenType op, Function &fn)
             throw Error(ErrorCode::BadExpr, "can\'t cmp!", current().getStart());
         fn.addInstruction(Instruction(Operation::SET_GT));
         fn.addInstruction(Instruction(Operation::NOT));
-        break;
+        return Type::BOOL;
     }
     case TokenType::GE:
     {
@@ -215,7 +215,7 @@ Type Analyser::operator_expr(Type t, TokenType op, Function &fn)
             throw Error(ErrorCode::BadExpr, "can\'t cmp!", current().getStart());
         fn.addInstruction(Instruction(Operation::SET_LT));
         fn.addInstruction(Instruction(Operation::NOT));
-        break;
+        return Type::BOOL;
     }
     case TokenType::LT:
     {
@@ -226,7 +226,7 @@ Type Analyser::operator_expr(Type t, TokenType op, Function &fn)
         else
             throw Error(ErrorCode::BadExpr, "can\'t cmp!", current().getStart());
         fn.addInstruction(Instruction(Operation::SET_LT));
-        break;
+        return Type::BOOL;
     }
     case TokenType::GT:
     {
@@ -237,7 +237,7 @@ Type Analyser::operator_expr(Type t, TokenType op, Function &fn)
         else
             throw Error(ErrorCode::BadExpr, "can\'t cmp!", current().getStart());
         fn.addInstruction(Instruction(Operation::SET_GT));
-        break;
+        return Type::BOOL;
     }
     case TokenType::NEQ:
     {
@@ -247,7 +247,7 @@ Type Analyser::operator_expr(Type t, TokenType op, Function &fn)
             fn.addInstruction(Instruction(Operation::CMP_F));
         else
             throw Error(ErrorCode::BadExpr, "can\'t cmp!", current().getStart());
-        break;
+        return Type::BOOL;
     }
     case TokenType::EQ:
     {
@@ -258,11 +258,12 @@ Type Analyser::operator_expr(Type t, TokenType op, Function &fn)
         else
             throw Error(ErrorCode::BadExpr, "can\'t cmp!", current().getStart());
         fn.addInstruction(Instruction(Operation::NOT));
-        break;
+        return Type::BOOL;
     }
     default:
         throw Error(ErrorCode::BadExpr, "no operation!", current().getStart());
     }
+    return Type::VOID;
 }
 Type Analyser::negate_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {
@@ -297,6 +298,7 @@ Type Analyser::assign_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
 }
 Type Analyser::as_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {
+    return Type::VOID;
 }
 
 Type Analyser::call_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
@@ -363,7 +365,7 @@ Type Analyser::call_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
     {
         expect(TokenType::L_PAREN);
         if (peek().getTokenType() == TokenType::STRING_LITERAL)
-            ident_expr(vt, ft, fn);
+            literal_expr(vt, ft, fn);
         else if (expr(vt, ft, fn) != Type::INT)
             throw Error(ErrorCode::ParamNotMatch, "ParamNotMatch", current().getStart());
         expect(TokenType::R_PAREN);
@@ -430,6 +432,7 @@ Type Analyser::literal_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
         next();
         return Type::INT;
     }
+    return Type::VOID;
 }
 Type Analyser::ident_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {
