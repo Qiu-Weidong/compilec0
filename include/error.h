@@ -46,7 +46,8 @@ enum ErrorCode : int
     VaribleNotDecl,
     DuplicateDecl,
     FunctionNotDecl,
-    InvalidType
+    InvalidType,
+    ConstMustBeInitial
 };
 
 class Error : public std::exception

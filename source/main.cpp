@@ -3,7 +3,7 @@
 #include <string>
 #include "tokenizer.h"
 #include "error.h"
-// #include "analyser.h"
+#include "analyser.h"
 #include "varible.h"
 #include "program.h"
 
@@ -18,11 +18,11 @@ int main(int argc, char *argv[])
     Tokenizer tokenizer;
     try
     {
-        // tokenizer.analyse(argv[2]);
+        tokenizer.analyse(argv[2]);
         const auto tokens = tokenizer.getTokens();
-        // Analyser analyser(tokens);
+        Analyser analyser(tokens);
         // 进行语法分析并生成指令
-        // analyser.program();
+        analyser.program(program);
         // 输出到二进制文件
         std::ofstream fout;
         fout.open(argv[4],std::ios::out|std::ios::binary);
