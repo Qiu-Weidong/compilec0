@@ -57,7 +57,7 @@ void Analyser::program(Program & pg)
         if( t == TokenType::FN_KW)
             func(globals,ft);
         else if(t == TokenType::LET_KW || t == TokenType::CONST_KW)
-            decl_stmt(globals,_start);
+            decl_stmt(globals,ft,_start);
         else throw Error(ErrorCode::InvalidItem,"invalid item",current().getStart());
     }
     std::cout << "Accepted!" << std::endl;

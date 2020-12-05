@@ -83,7 +83,7 @@ void Analyser::continue_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
 void Analyser::return_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {
     expect(TokenType::RETURN_KW);
-    expr(vt,ft,fn);
+    if(expr(vt,ft,fn) != fn.getReturnType()) throw Error(ErrorCode::TypeNotMatch,"function return error type!",current().getStart());
     expect(TokenType::SEMICOLON);
 }
 void Analyser::empty_stmt()// 可以不要
@@ -117,10 +117,10 @@ void Analyser::decl_stmt(VaribleTable &vt,FunctionTable & ft, Function &fn)
     {
         next();
         if(var.getKind() == Kind::GLOBAL)
-        fn.addInstruction(Instruction(Operation::GLOBA,(unsigned int)var.getAddress()));
+        fn.addInstruction(Instruction(Operation::GLOBA,var.getAddress()));
         else if(var.getKind() == Kind::VAR)
-        fn.addInstruction(Instruction(Operation::LOCA,(unsigned int)var.getAddress()));
-        expr(vt,ft,fn);
+        fn.addInstruction(Instruction(Operation::LOCA,var.getAddress()));
+        if(expr(vt,ft,fn)!=var.getType()) throw Error(ErrorCode::TypeNotMatch,"type is not match!",current().getStart());
         fn.addInstruction(Instruction(Operation::STORE_64));
     }
     expect(TokenType::SEMICOLON);

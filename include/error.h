@@ -47,7 +47,10 @@ enum ErrorCode : int
     DuplicateDecl,
     FunctionNotDecl,
     InvalidType,
-    ConstMustBeInitial
+    ConstMustBeInitial,
+    TypeNotMatch,
+    ConstValueChanged,
+    InvalidAssign
 };
 
 class Error : public std::exception

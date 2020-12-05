@@ -71,7 +71,7 @@ private :
     ///        如果是局部变量，则表示第几个局部变量
     ///        可能需要加入符号表中才分配
     ///////////////////////////
-    unsigned long long address;
+    unsigned int address;
 public:
     Varible() = default;
     Varible(const Varible &) = default;
@@ -80,7 +80,7 @@ public:
     Varible & operator=(Varible &&) = default;
     ~Varible() = default;
 
-    Varible(const std::string & name,const Kind kind, const Type type,unsigned long long address=0,bool is_const = false) 
+    Varible(const std::string & name,const Kind kind, const Type type,unsigned int address=0,bool is_const = false) 
     {
         this->type = type;
         this->name = name;
@@ -96,10 +96,10 @@ public:
     Type getType() const { return type; }
     Kind getKind() const { return kind; }
     int getSize() const { return size; }
-    unsigned long long getAddress() const { return address; }
+    unsigned int getAddress() const { return address; }
 
     void setConst(bool is_const) { this->is_const = is_const;}
-    void setAddress(int address) { this->address = address; }
+    void setAddress(unsigned int address) { this->address = address; }
     void setType(Type type) { this->type = type; }
     void setKind(Kind kind) { this->kind = kind; }
     void setSize(int size) { this->size = size; }

@@ -33,15 +33,15 @@ private:
     /// \exception 如果未定义，则抛出异常
     /// expr -> 
     /////////////////////////////////////////
-    void expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
-    void operator_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
-    void negate_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
-    void assign_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
-    void as_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
-    void call_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
-    void literal_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
-    void ident_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
-    void group_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
+    Type expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
+    Type operator_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
+    Type negate_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
+    Type assign_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
+    Type as_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
+    Type call_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
+    Type literal_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
+    Type ident_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
+    Type group_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
 
 
     ///////////////////////////////////////////////////
