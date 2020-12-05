@@ -91,17 +91,19 @@ private:
     int size;
 
     /////////////////
-    /// \brief 操作数
+    /// \brief 操作数,只有4种类型
     /////////////////
     union 
     {
-        char u8;
-        short u16;
-        int u32;
-        long long u64;
-        double f64;
+        unsigned int u32;
+        unsigned long long u64;
+        int i32;
+        long long i64;
     }num;
 public:
+    ////////////////////////////
+    /// \brief 默认的6个构造/析构函数
+    ////////////////////////////
     Instruction() = default;
     Instruction(const Instruction &) = default;
     Instruction(Instruction &&) = default;
@@ -113,12 +115,14 @@ public:
     /// \brief 没有操作数的指令的构造函数
     //////////////////////////
     Instruction(Operation op): op(op),size(0) {} 
-    Instruction(Operation op,char u8) : op(op),size(1) { this->num.u8 = u8; }
-    Instruction(Operation op,short u16) : op(op),size(2) { this->num.u16 = u16; }
-    Instruction(Operation op,int u32) : op(op),size(4) { this->num.u32 = u32; }
-    Instruction(Operation op,long long u64) : op(op),size(8) { this->num.u64 = u64; }
-    Instruction(Operation op,double f64) : op(op),size(8) { this->num.f64 = f64; }
+    Instruction(Operation op,unsigned int u32) : op(op),size(4) { this->num.u32 = u32; }
+    Instruction(Operation op,unsigned long long u64) : op(op),size(8) { this->num.u64 = u64; }
+    Instruction(Operation op,int i32) : op(op),size(4) { this->num.i32 = i32; }
+    Instruction(Operation op,long long i64) : op(op),size(8) { this->num.i64; }
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief 用于输出的友元函数
+    ///////////////////////////////////////////////////////////////////////////
     friend std::ostream & operator<<(std::ostream & os,const Instruction & i)
     {
         write(os,(void *)(&i.op),sizeof(i.op));

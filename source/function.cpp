@@ -22,12 +22,13 @@ bool FunctionTable::isDeclared(const std::string &name)
     }
     return false;
 }
-void FunctionTable::insert(Function &fn, const Position &pos)
+int FunctionTable::insert(Function &fn, const Position &pos)
 {
     if (isDeclared(fn.getName()))
         throw Error(ErrorCode::DuplicateDecl, "function \"" + fn.getName() + "\" is duplicate declared!", pos);
     fn.setFid(next_fid++);
     functions.push_back(fn);
+    return fn.getFid();
 }
 
 Function &FunctionTable::get(const std::string &name, const Position &pos)

@@ -15,7 +15,9 @@ enum class Type
     // void型
     VOID,
     // 浮点型
-    DOUBLE
+    DOUBLE,
+    // 字符串
+    STRING
 };
 ///////////////
 /// \brief 符号表的条目类型，
@@ -44,7 +46,7 @@ private :
     bool is_const;
 
     /////////////////
-    /// \brief 变量名
+    /// \brief 变量名，如果是字符串常量，则保存字符串
     /////////////////
     std::string name;
 
@@ -115,15 +117,73 @@ private:
     VaribleTable * parent;
     std::vector<Varible> table;
 public:
+    /////////////////////////////////////////////
+    /// \brief 符号表的构造函数
+    /// \param parent 父级符号表指针
+    /////////////////////////////////////////////
     VaribleTable(VaribleTable * parent = nullptr) 
         : parent(parent) {}
+    
+    ////////////////////////////////////////////////////////
+    /// \brief 符号表的构造函数
+    /// \param parent 父级符号表引用
+    ////////////////////////////////////////////////////////
+    VaribleTable(VaribleTable & parent) 
+        : parent(&parent) {}
+    
+    //////////////////////////////////////////////
+    /// \brief 判断变量名在当前符号表种是否被定义
+    /// \param var_name 要判断的变量名
+    /// \return 是否被定义
+    /// \note 仅考虑当前符号表，不考虑父级
+    //////////////////////////////////////////////
     bool isDeclared(const std::string & var_name);
+
+    //////////////////////////////////////////////////////
+    /// \brief 将变量插入符号表
+    /// \param var 要插入的变量
+    /// \param pos 变量在程序中的位置，报错用
+    /// \exception 如果已经定义，则抛出异常
+    //////////////////////////////////////////////////////
     void insert(const Varible & var,const Position & pos);
+
+    //////////////////////////////////////////////////////////////////////
+    /// \brief 通过变量名在符号表中查找变量
+    /// \param var_name 要查找的变量名
+    /// \param pos 对变量的引用出现的位置，报错用
+    /// \return 查找的变量的引用
+    /// \exception 如果当前表以及所有的父级表中都没有，抛出异常
+    /// \note 如果当前表中没有，则继续查找父级表
+    //////////////////////////////////////////////////////////////////////
     const Varible & get(const std::string & var_name,const Position & pos);
 
+    ////////////////////////////////////////////////////////
+    /// \brief 判断当前符号表是否是全局符号表
+    /// \return 是否是全局符号表
+    ////////////////////////////////////////////////////////
     bool isGlobalTable() const { return parent == nullptr; }
+
+    //////////////////////////
+    /// \brief 获取全局符号表
+    /// \return 全局符号表的引用
+    //////////////////////////
+    VaribleTable & getGlobal() 
+    { 
+        if(parent == nullptr) return *this;
+        return parent->getGlobal();
+    }
+
+    //////////////////////////////////
+    /// \brief 清空符号表
+    //////////////////////////////////
     void clear() { table.clear(); }
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief 友元函数，用于输出
+    /// \param os 用于输出的流
+    /// \param vr 待输出的符号表
+    /// \return 输出流的引用
+    ///////////////////////////////////////////////////////////////////////////
     friend std::ostream & operator<<(std::ostream & os,const VaribleTable & vr);
 };
 #endif // VARIBLE_H_

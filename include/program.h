@@ -22,18 +22,22 @@ public:
     VaribleTable & getGlobals() { return globals; }
     FunctionTable & getFunctions() { return functions; }
 
-    Function & getFunction(std::string name,const Position & pos) { 
+    Function & getFunction(const std::string & name,const Position & pos) { 
         return functions.get(name,pos);
     }
-    const Varible & getGlobal(std::string name,const Position & pos) { return globals.get(name,pos);}
+    const Varible & getGlobal(const std::string & name,const Position & pos) { return globals.get(name,pos);}
     void addFunction(Function & fn,const Position & pos) { functions.insert(fn,pos); }
     void addGlobal(Varible & var, const Position & pos) { globals.insert(var,pos); } 
 
+    /////////////
+    /// \brief 将_start函数添加到函数列表当中
+    /////////////
     void init() 
     {
         if(!functions.isDeclared("_start"))
         {
-            Function _start("_start",Type::VOID);functions.insert(_start,Position(0,0));
+            Function _start("_start",Type::VOID);
+            functions.insert(_start,Position(0,0));
         }
     }
     

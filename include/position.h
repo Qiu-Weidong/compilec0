@@ -1,6 +1,8 @@
 #ifndef POSITION_H_
 #define POSITION_H_
 #include <iostream>
+#include <string>
+
 struct Position
 {   
     //////////
@@ -23,6 +25,7 @@ struct Position
         this->row = row;
         this->col = col;
     }
+
     friend std::ostream & operator<<(std::ostream & os, const Position & p)
     {
         os << "(" << p.row << "," << p.col << ")";

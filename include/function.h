@@ -39,11 +39,6 @@ private:
     /////////////////////////////////////
     std::vector<Instruction> instructions;
 
-    //////////////////////
-    /// \brief 符号表，每个函数都有自己独立的符号表
-    //////////////////////
-    // VaribleTable varibles;
-
     /////////////////
     /// \brief 函数名称
     /////////////////
@@ -101,11 +96,46 @@ public:
     FunctionTable & operator=(const FunctionTable &) = default;
     FunctionTable & operator=(FunctionTable && ) = default;
 
+    /////////////////////////////////////////
+    /// \brief 判断名称为name的函数是否已经定义
+    /// \param name 函数名
+    /// \return 是否定义
+    /////////////////////////////////////////
     bool isDeclared(const std::string & name);
-    void insert(Function & fn, const Position & pos);
+
+    ///////////////////////////////////////////////
+    /// \brief 向函数表中插入函数
+    /// \param fn 要插入的函数
+    /// \param pos 函数定义的位置
+    /// \return 为该函数分配的fid
+    /// \exception 如果已经定义，抛出异常
+    ///////////////////////////////////////////////
+    int insert(Function & fn, const Position & pos);
+
+    /////////////////////////////////////////////////////////////
+    /// \brief 按函数名获取函数
+    /// \param name 函数名
+    /// \param pos 函数引用的位置
+    /// \return 函数的引用
+    /// \exception 如果函数没用定义，抛出异常
+    /////////////////////////////////////////////////////////////
     Function & get(const std::string & name,const Position & pos);
+
+    ////////////////////////////////////////////
+    /// \brief 按函数fid获取函数
+    /// \param fid 函数fid
+    /// \param pos 函数引用出现的位置
+    /// \return 获取到的函数的引用
+    /// \exception 如果没有找到，抛出异常
+    ////////////////////////////////////////////
     Function & get(int fid,const Position & pos);
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// \brief 输出函数
+    /// \param os 用于输出的流
+    /// \param ft 要输出的函数
+    /// \return 输出流
+    ////////////////////////////////////////////////////////////////////////////
     friend std::ostream & operator<<(std::ostream & os,const FunctionTable & ft);
 };
 #endif // FUNCTION_H_

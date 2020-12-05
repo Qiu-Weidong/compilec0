@@ -1,3 +1,4 @@
+#include <cassert>
 #include "varible.h"
 #include "error.h"
 
@@ -39,13 +40,24 @@ std::ostream &operator<<(std::ostream &os, const VaribleTable &vr)
 
 std::ostream &operator<<(std::ostream &os, const Varible &var)
 {
+    // 只有全局变量才需要输出
+    assert(var.kind == Kind::GLOBAL);
+    if (var.type == Type::STRING)
+        assert(var.name.size() == var.size);
     char c = var.is_const ? 1 : 0;
     // 是否是常量
     write(os, (void *)&c, sizeof(c));
     // 变量的size
     write(os, (void *)&var.size, sizeof(var.size));
-    long long t = 0;
-    // 用0填充，在_start函数里面去完成赋值
-    write(os, (void *)&t, var.size);
+    if (var.type == Type::STRING)
+    {
+        for(auto c : var.name) write(os,(void *)&c,sizeof(c));
+    }
+    else
+    {
+        long long t = 0;
+        // 用0填充，在_start函数里面去完成赋值
+        write(os, (void *)&t, var.size);
+    }
     return os;
 }

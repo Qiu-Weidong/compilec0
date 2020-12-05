@@ -80,7 +80,7 @@ public:
     // virtual const char * what() const override {}
     ErrorCode getCode() const { return code; }
     Position getPosition() const { return pos; }
-    std::string getMsg() const { return msg; }
+    const std::string & getMsg() const { return msg; }
 
     friend std::ostream &operator<<(std::ostream &os, const Error &err)
     {
