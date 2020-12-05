@@ -34,7 +34,7 @@ private:
     /// expr -> 
     /////////////////////////////////////////
     Type expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
-    Type operator_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
+    Type operator_expr(Type t,TokenType op, Function & fn);
     Type negate_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
     Type assign_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);
     Type as_expr(VaribleTable & vt,FunctionTable & ft, Function & fn);

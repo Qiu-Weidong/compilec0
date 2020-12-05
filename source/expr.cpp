@@ -39,89 +39,230 @@
  * 表达式执行完成后，结果一定在栈顶
  */
 
-/////////////////////////////
-/// \brief 将运算符编号
-/////////////////////////////
-int token_to_int(TokenType ty);
-TokenType int_to_token(int id);
-int matrix[12][12] = {
-    //          $   +   -   *   /   >   <  >=  <=  ==  !=  as
-    /* $ */   { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-    /* + */   { 1,  1,  1, -1, -1,  1,  1,  1,  1,  1,  1, -1 },
-    /* - */   { 1,  1,  1, -1, -1,  1,  1,  1,  1,  1,  1, -1 },
-    /* * */   { 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1 },
-    /* / */   { 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, -1  },
-    /* > */   { 1, -1, -1, -1, -1,  1,  1,  1,  1,  1,  1, -1 },
-    /* < */   { 1, -1 ,-1, -1, -1,  1,  1,  1,  1,  1,  1, -1 },
-    /*>= */   { 1, -1, -1, -1, -1,  1,  1,  1,  1,  1,  1, -1 },
-    /*<= */   { 1, -1, -1, -1, -1,  1,  1,  1,  1,  1,  1, -1 },
-    /*== */   { 1, -1, -1, -1, -1,  1,  1,  1,  1,  1,  1, -1 },
-    /*!= */   { 1, -1, -1, -1, -1,  1,  1,  1,  1,  1,  1, -1 },
-    /*as */   { 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1 }
-};
+bool less(TokenType a, TokenType b);
+
 Type Analyser::expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {
-    int top = 0;
-    int op[100];
-    Type ty[100];
-    op[top++] = 0; // 0 表示 '$'
     if (isExpressionTermination(peek().getTokenType()))
         return Type::VOID;
+    // 建立两个栈，一个用于符号，另一个用于保存类型
+    TokenType op[100];
+    Type ty[100];
+    int t_op = 0;
+    int t_ty = 0;
+    op[t_op++] = TokenType::NONE; // NONE for '$'
+
     while (has_next() && isExpressionTermination(peek().getTokenType()))
     {
         if (peek().getTokenType() == TokenType::L_PAREN)
         {
             // 两个表达式不能相邻
-            if (top > 0 && op[top - 1] == -1)
+            if (t_op <= t_ty)
                 throw Error(ErrorCode::BadExpr, "bad expr!", current().getStart());
-            ty[top] = group_expr(vt, ft, fn);
-            op[top] = -1;
-            top++;
+            ty[t_ty++] = group_expr(vt, ft, fn);
         }
         else if (peek().getTokenType() == TokenType::IDENT)
         {
-            if (top > 0 && op[top - 1] == -1)
+            if (t_op <= t_ty)
                 throw Error(ErrorCode::BadExpr, "bad expr!", current().getStart());
             next();
             if (has_next() && peek().getTokenType() == TokenType::L_PAREN)
             {
                 // 函数调用
                 previous();
-                ty[top] = call_expr(vt, ft, fn);
-                op[top] = -1;
-                top++;
+                ty[t_ty++] = call_expr(vt, ft, fn);
+            }
+            else if(has_next() && peek().getTokenType() == TokenType::ASSIGN)
+            {
+                previous();
+                ty[t_ty++] = assign_expr(vt,ft,fn);
             }
             else
             {
                 // 普通标识符
                 previous();
-                ty[top] = ident_expr(vt, ft, fn);
-                op[top] = -1;
-                top++;
+                ty[t_ty++] = ident_expr(vt, ft, fn);
             }
         }
-        else if (peek().getTokenType() == TokenType::MINUS && op[top - 1] != -1)
+        else if (peek().getTokenType() == TokenType::UINT_LITERAL || peek().getTokenType() == TokenType::CHAR_LITERAL || peek().getTokenType() == TokenType::STRING_LITERAL || peek().getTokenType() == TokenType::DOUBLE_LITERAL)
+        {
+            if (t_op <= t_ty)
+                throw Error(ErrorCode::BadExpr, "bad expr!", current().getStart());
+            ty[t_ty++] = literal_expr(vt, ft, fn);
+        }
+        else if (peek().getTokenType() == TokenType::MINUS && t_op > t_ty)
         {
             // 这个减号是前置的
-            ty[top] = negate_expr(vt, ft, fn);
-            op[top] = -1;
-            top++;
+            ty[t_ty++] = negate_expr(vt, ft, fn);
         }
-        else {
+        else if (peek().getTokenType() == TokenType::AS_KW)
+        {
+            next();
+            auto type = expect(TokenType::TY).getValue();
+            if (t_op > t_ty || type != "int" && type != "double" || t_ty <= 0)
+                throw Error(ErrorCode::BadExpr, "bad expr!", current().getStart());
+            if (ty[t_ty - 1] == Type::INT && type == "double")
+            {
+                ty[t_ty - 1] = Type::DOUBLE;
+                fn.addInstruction(Instruction(Operation::ITOF));
+            }
+            else if (ty[t_ty - 1] == Type::DOUBLE && type == "int")
+            {
+                ty[t_ty - 1] = Type::INT;
+                fn.addInstruction(Instruction(Operation::FTOI));
+            }
+            else
+                throw Error(ErrorCode::BadExpr, "type change fail!", current().getStart());
+        }
+        else
+        {
+            auto type = peek().getTokenType();
+            if (t_op != t_ty || type == TokenType::ASSIGN || type == TokenType::R_PAREN ||
+                type == TokenType::COMMA || type == TokenType::TY)
+                throw Error(ErrorCode::BadExpr, "bad expr", current().getStart());
             // 这里开始使用算符优先文法
-            // 不会出现 (、ident、和前置-
-            if(token_to_int(peek().getTokenType()) <= 0) throw Error(ErrorCode::BadExpr, "bad expr!", current().getStart());
-            int u = op[top-1] == -1 ? op[top-2] : op[top-1]; // u 栈顶符号
-            int v = token_to_int(peek().getTokenType());
-            if(matrix[u][v] <= 0) op[top++] = v;
-            else {
-                auto t = int_to_token(u);
+            // 不会出现 (、ident、和前置-，这时一定是符号
+
+            if (less(op[t_op - 1], type))
+            {
+                // 移入
+                op[t_op++] = next().getTokenType();
+            }
+            else
+            {
+                // 归约
+                if (ty[t_ty - 1] != ty[t_ty - 2])
+                    throw Error(ErrorCode::TypeNotMatch, "type does not match!", current().getStart());
+                t_ty -= 2;
+                t_op--;
+                ty[t_ty++] = operator_expr(ty[t_ty - 1], op[t_op - 1], fn);
             }
         }
     }
+    while (!less(op[t_op - 1], TokenType::NONE))
+    {
+        if (ty[t_ty - 1] != ty[t_ty - 2])
+            throw Error(ErrorCode::TypeNotMatch, "type does not match!", current().getStart());
+        t_ty -= 2;
+        t_op--;
+        ty[t_ty++] = operator_expr(ty[t_ty - 1], op[t_op - 1], fn);
+    }
+    return ty[0];
 }
-Type Analyser::operator_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
+Type Analyser::operator_expr(Type t, TokenType op, Function &fn)
 {
+    switch (op)
+    {
+    case TokenType::PLUS:
+    {
+        if (t == Type::INT)
+            fn.addInstruction(Instruction(Operation::ADD_I));
+        else if (t == Type::DOUBLE)
+            fn.addInstruction(Instruction(Operation::ADD_F));
+        else
+            throw Error(ErrorCode::BadExpr, "can\'t add!", current().getStart());
+        break;
+    }
+    case TokenType::MINUS:
+    {
+        if (t == Type::INT)
+            fn.addInstruction(Instruction(Operation::SUB_I));
+        else if (t == Type::DOUBLE)
+            fn.addInstruction(Instruction(Operation::SUB_F));
+        else
+            throw Error(ErrorCode::BadExpr, "can\'t sub!", current().getStart());
+        break;
+    }
+    case TokenType::MUL:
+    {
+        if (t == Type::INT)
+            fn.addInstruction(Instruction(Operation::MUL_I));
+        else if (t == Type::DOUBLE)
+            fn.addInstruction(Instruction(Operation::MUL_F));
+        else
+            throw Error(ErrorCode::BadExpr, "can\'t mul!", current().getStart());
+        break;
+    }
+    case TokenType::DIV:
+    {
+        if (t == Type::INT)
+            fn.addInstruction(Instruction(Operation::DIV_I));
+        else if (t == Type::DOUBLE)
+            fn.addInstruction(Instruction(Operation::DIV_F));
+        else
+            throw Error(ErrorCode::BadExpr, "can\'t div!", current().getStart());
+        break;
+    }
+    case TokenType::LE:
+    {
+        if (t == Type::INT)
+            fn.addInstruction(Instruction(Operation::CMP_I));
+        else if (t == Type::DOUBLE)
+            fn.addInstruction(Instruction(Operation::CMP_F));
+        else
+            throw Error(ErrorCode::BadExpr, "can\'t cmp!", current().getStart());
+        fn.addInstruction(Instruction(Operation::SET_GT));
+        fn.addInstruction(Instruction(Operation::NOT));
+        break;
+    }
+    case TokenType::GE:
+    {
+        if (t == Type::INT)
+            fn.addInstruction(Instruction(Operation::CMP_I));
+        else if (t == Type::DOUBLE)
+            fn.addInstruction(Instruction(Operation::CMP_F));
+        else
+            throw Error(ErrorCode::BadExpr, "can\'t cmp!", current().getStart());
+        fn.addInstruction(Instruction(Operation::SET_LT));
+        fn.addInstruction(Instruction(Operation::NOT));
+        break;
+    }
+    case TokenType::LT:
+    {
+        if (t == Type::INT)
+            fn.addInstruction(Instruction(Operation::CMP_I));
+        else if (t == Type::DOUBLE)
+            fn.addInstruction(Instruction(Operation::CMP_F));
+        else
+            throw Error(ErrorCode::BadExpr, "can\'t cmp!", current().getStart());
+        fn.addInstruction(Instruction(Operation::SET_LT));
+        break;
+    }
+    case TokenType::GT:
+    {
+        if (t == Type::INT)
+            fn.addInstruction(Instruction(Operation::CMP_I));
+        else if (t == Type::DOUBLE)
+            fn.addInstruction(Instruction(Operation::CMP_F));
+        else
+            throw Error(ErrorCode::BadExpr, "can\'t cmp!", current().getStart());
+        fn.addInstruction(Instruction(Operation::SET_GT));
+        break;
+    }
+    case TokenType::NEQ:
+    {
+        if (t == Type::INT)
+            fn.addInstruction(Instruction(Operation::CMP_I));
+        else if (t == Type::DOUBLE)
+            fn.addInstruction(Instruction(Operation::CMP_F));
+        else
+            throw Error(ErrorCode::BadExpr, "can\'t cmp!", current().getStart());
+        break;
+    }
+    case TokenType::EQ:
+    {
+        if (t == Type::INT)
+            fn.addInstruction(Instruction(Operation::CMP_I));
+        else if (t == Type::DOUBLE)
+            fn.addInstruction(Instruction(Operation::CMP_F));
+        else
+            throw Error(ErrorCode::BadExpr, "can\'t cmp!", current().getStart());
+        fn.addInstruction(Instruction(Operation::NOT));
+        break;
+    }
+    default:
+        throw Error(ErrorCode::BadExpr, "no operation!", current().getStart());
+    }
 }
 Type Analyser::negate_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {
@@ -152,7 +293,7 @@ Type Analyser::assign_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
     if (type != l_expr.getType())
         throw Error(ErrorCode::InvalidAssign, "invalid assign", current().getStart());
     fn.addInstruction(Instruction(Operation::STORE_64));
-    return type;
+    return Type::VOID;
 }
 Type Analyser::as_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {
@@ -310,65 +451,21 @@ Type Analyser::group_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
     expect(TokenType::R_PAREN);
     return ret;
 }
-
-int token_to_int(TokenType ty)
+bool less(TokenType a,TokenType b)
 {
-    switch (ty)
-    {
-    case TokenType::PLUS:
-        return 1;
-    case TokenType::MINUS:
-        return 2;
-    case TokenType::MUL:
-        return 3;
-    case TokenType::DIV:
-        return 4;
-    case TokenType::GT:
-        return 5;
-    case TokenType::LT:
-        return 6;
-    case TokenType::GE:
-        return 7;
-    case TokenType::LE:
-        return 8;
-    case TokenType::EQ:
-        return 9;
-    case TokenType::NEQ:
-        return 10;
-    case TokenType::AS_KW:
-        return 11;
-    default:
-        return 0;
+    // 只用考虑 + -  * / 和比较
+    if(a == b) return false;
+    else if(a == TokenType::NONE) return b != TokenType::NONE;
+    else if(b == TokenType::NONE) return false;
+    else if(a == TokenType::LT || a == TokenType::GT || a == TokenType::LE || a == TokenType::GE){
+        if(b == TokenType::LT || b == TokenType::GT || b == TokenType::LE || b == TokenType::GE || b == TokenType::NONE)
+            return false;
+        return true;
     }
-}
-
-TokenType int_to_token(int id)
-{
-    switch (id)
+    else if(a == TokenType::PLUS || a == TokenType::MINUS)
     {
-    case 1:
-        return TokenType::PLUS;
-    case 2:
-        return TokenType::MINUS;
-    case 3:
-        return TokenType::MUL;
-    case 4:
-        return TokenType::DIV;
-    case 5:
-        return TokenType::GT;
-    case 6:
-        return TokenType::LT;
-    case 7:
-        return TokenType::GE;
-    case 8:
-        return TokenType::LE;
-    case 9:
-        return TokenType::EQ;
-    case 10:
-        return TokenType::NEQ;
-    case 11:
-        return TokenType::AS_KW;
-    default:
-        return TokenType::NONE;
+        if(b == TokenType::MUL || b == TokenType::DIV) return true;
+        return false;
     }
+    else return false;
 }
