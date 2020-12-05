@@ -60,6 +60,8 @@ void Analyser::program(Program & pg)
             decl_stmt(globals,ft,_start);
         else throw Error(ErrorCode::InvalidItem,"invalid item",current().getStart());
     }
+    Function & main = pg.getFunction("main",current().getStart());
+    _start.addInstruction(Instruction(Operation::CALL,main.getFid()));
     std::cout << "Accepted!" << std::endl;
 }
 
