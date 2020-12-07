@@ -1,5 +1,9 @@
+#include <cstring>
+#include <cassert>
 #include "analyser.h"
 
+extern char * str[1000];
+extern unsigned int nextGlobalOffset;
 void Analyser::func(VaribleTable &parent, FunctionTable &ft)
 {
     Function fn;
@@ -43,11 +47,23 @@ void Analyser::func(VaribleTable &parent, FunctionTable &ft)
 
     for(auto & param : params) {vt.insert(param,current().getStart()); fn.addParamType(param.getType());}
     block_stmt(vt,ft,fn);
+    fn.addInstruction(Instruction(Operation::RET));
 #ifdef DEBUG
     std::cout << fn << std::endl;
     printf("fuck!\n");
 #endif // DEBUG
-    
+    auto & global = parent.getGlobal();
+    Varible fn_name("",Kind::GLOBAL,Type::STRING);
+    fn_name.setConst(false);
+    fn_name.setSize(name.size());
+    fn_name.setAddress(nextGlobalOffset++);
+    global.insert(fn_name,current().getStart());
+    unsigned int vaddr = fn_name.getAddress();
+    assert(str[vaddr] == nullptr);
+    int len = name.size() + 1;
+    str[vaddr] = new char[len];
+    strcpy(str[vaddr],name.c_str());
+    fn.setFname(vaddr);
     ft.insert(fn,current().getStart());
 }
 Varible Analyser::func_param()

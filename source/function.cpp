@@ -3,7 +3,7 @@
 #ifndef DEBUG
 std::ostream &operator<<(std::ostream &os, const Function &f)
 {
-    write(os, (void *)&f.fid, sizeof(f.fid));
+    write(os, (void *)&f.fname, sizeof(f.fname));
     write(os, (void *)&f.return_slots, sizeof(f.return_slots));
     write(os, (void *)&f.param_slots, sizeof(f.param_slots));
     write(os, (void *)&f.loca_slots, sizeof(f.loca_slots));
@@ -65,8 +65,8 @@ Function & FunctionTable::get(int fid,const Position & pos)
 #ifndef DEBUG
 std::ostream &operator<<(std::ostream &os, const FunctionTable &ft)
 {
-    int n = ft.functions.size();
-    write(os, (void *)&n, sizeof(n));
+    // int n = ft.functions.size();
+    // write(os, (void *)&n, sizeof(n));
     for (const auto &fn : ft.functions)
         os << fn;
     return os;
@@ -74,7 +74,7 @@ std::ostream &operator<<(std::ostream &os, const FunctionTable &ft)
 #else
 std::ostream & operator<<(std::ostream & os,const FunctionTable & ft)
 {
-    os << "fn counts: "<<ft.functions.size() << std::endl;
+    // os << "fn counts: "<<ft.functions.size() << std::endl;
     for(const auto & fn : ft.functions) os << fn << std::endl;
     return os;
 }

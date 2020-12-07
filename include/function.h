@@ -19,6 +19,11 @@ private:
     /////////////////
     unsigned int fid;
 
+    //////////////////
+    /// \brief 函数名称对应的全局变量地址
+    //////////////////
+    unsigned int fname;
+
     /////////////////////////
     /// \brief 返回值所占的槽数
     /////////////////////////
@@ -63,6 +68,7 @@ public:
         this->return_type = Type::VOID;
         this->param_slots = 0;
         this->loca_slots = 0;
+        this->fname = 0;
         instructions.clear();
         param_types.clear();
     };
@@ -87,6 +93,7 @@ public:
     const std::vector<Type> & getParamTypes() const { return param_types; }
 
     // set
+    void setFname(unsigned int fname) { this->fname = fname; }
     void setName(const std::string & name) { this->name = name; }
     void setReturnSlots(int rslots) { this->return_slots = rslots; }
     void setParamSlots(int pslots) { this->param_slots = pslots; }
@@ -145,6 +152,8 @@ public:
     /// \exception 如果没有找到，抛出异常
     ////////////////////////////////////////////
     Function & get(int fid,const Position & pos);
+
+    int size() const { return functions.size(); }
 
     ////////////////////////////////////////////////////////////////////////////
     /// \brief 输出函数

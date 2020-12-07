@@ -1,3 +1,5 @@
+#include <cstring>
+#include <cassert>
 #include "analyser.h"
 
 /*
@@ -38,6 +40,9 @@
  * +-------------------------------------------------------------------------------+
  * 表达式执行完成后，结果一定在栈顶
  */
+
+extern char * str[1000];
+extern unsigned int nextGlobalOffset;
 
 bool less(TokenType a, TokenType b);
 
@@ -422,13 +427,21 @@ Type Analyser::literal_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
     else if (t == TokenType::STRING_LITERAL)
     {
         Varible var;
-        var.setName(peek().getValue());
+        var.setName("");
         var.setType(Type::STRING);
         var.setSize(peek().getValue().size());
         var.setKind(Kind::GLOBAL);
+        var.setConst(false);
+        var.setAddress(nextGlobalOffset++);
+        unsigned int addr = var.getAddress();
+
+        int len = peek().getValue().size() + 1;
+        assert(str[addr] == nullptr);
+        str[addr] = new char[len];
+        strcpy(str[addr],peek().getValue().c_str());
         auto &globals = vt.getGlobal();
         globals.insert(var, current().getStart());
-        fn.addInstruction(Instruction(Operation::PUSH, var.getAddress()));
+        fn.addInstruction(Instruction(Operation::PUSH, (unsigned long long)addr));
         next();
         return Type::INT;
     }

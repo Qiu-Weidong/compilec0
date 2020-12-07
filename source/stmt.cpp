@@ -1,5 +1,7 @@
 #include "analyser.h"
 
+
+extern int nextGlobalOffset;
 void Analyser::stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {
     auto type = peek().getTokenType();
@@ -114,7 +116,11 @@ void Analyser::decl_stmt(VaribleTable &vt,FunctionTable & ft, Function &fn)
     else throw Error(ErrorCode::InvalidType,"No such type",current().getStart());
     if(vt.isGlobalTable()) var.setKind(Kind::GLOBAL);
     else var.setKind(Kind::VAR);
-    var.setAddress(fn.nextLoca());
+
+    if(var.getKind() != Kind::GLOBAL)
+        var.setAddress(fn.nextLoca());
+    else var.setAddress(nextGlobalOffset++);
+    
     vt.insert(var,current().getStart());
     if(var.isConst() && peek().getTokenType() != TokenType::ASSIGN)
         throw Error(ErrorCode::ConstMustBeInitial,"const varible is not initial!",current().getStart());

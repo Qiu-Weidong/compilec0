@@ -2,8 +2,10 @@
 #include "varible.h"
 #include "error.h"
 
+extern char * str[1000];
 bool VaribleTable::isDeclared(const std::string &name)
 {
+    if(name == "") return false; // 匿名变量不认为重名
     for (const auto &var : table)
     {
         if (var.getName() == name)
@@ -13,6 +15,7 @@ bool VaribleTable::isDeclared(const std::string &name)
 }
 const Varible &VaribleTable::get(const std::string &name, const Position &pos)
 {
+    if(name == "") throw Error(ErrorCode::VaribleNotDecl, "you can\'t get a anoymous varible!", pos);
     for (const auto &var : table)
     {
         if (var.getName() == name)
@@ -30,11 +33,11 @@ void VaribleTable::insert(const Varible &var, const Position &pos)
 }
 
 #ifndef DEBUG
-std::ostream &operator<<(std::ostream &os, const VaribleTable &vr)
+std::ostream &operator<<(std::ostream &os, const VaribleTable &vt)
 {
-    int n = vr.table.size();
+    int n = vt.table.size();
     write(os, (void *)&n, sizeof(n));
-    for (const auto &var : vr.table)
+    for (const auto &var : vt.table)
         os << var;
     return os;
 }
@@ -43,8 +46,6 @@ std::ostream &operator<<(std::ostream &os, const Varible &var)
 {
     // 只有全局变量才需要输出
     assert(var.kind == Kind::GLOBAL);
-    if (var.type == Type::STRING)
-        assert(var.name.size() == var.size);
     char c = var.is_const ? 1 : 0;
     // 是否是常量
     write(os, (void *)&c, sizeof(c));
@@ -52,7 +53,9 @@ std::ostream &operator<<(std::ostream &os, const Varible &var)
     write(os, (void *)&var.size, sizeof(var.size));
     if (var.type == Type::STRING)
     {
-        for(auto c : var.name) write(os,(void *)&c,sizeof(c));
+        unsigned int addr = var.getAddress();
+        assert(str[addr]!=nullptr);
+        for(int i=0;i<var.size;i++) write(os,(void *)(str[addr]+i),sizeof(char));
     }
     else
     {
@@ -66,10 +69,12 @@ std::ostream &operator<<(std::ostream &os, const Varible &var)
 std::ostream & operator<<(std::ostream & os,const Varible & var)
 {
     assert(var.kind == Kind::GLOBAL);
-    if(var.type == Type::STRING) assert(var.name.size() == var.size);
     os << "is const: " << var.is_const << std::endl;
     os << "size:     " << var.size << std::endl;
-    if(var.type == Type::STRING) os << var.name;
+    if(var.type == Type::STRING) 
+    {
+        os << "string: " << str[var.size] << std::endl;
+    }
     else {
         for(int i=0;i<var.size;i++)
             os << "00 " ;

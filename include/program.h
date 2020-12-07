@@ -33,38 +33,11 @@ public:
     /////////////
     /// \brief 初始化_start函数
     /////////////
-    void init() 
-    {
-        _start.setFid(0);
-        _start.setLocaSlots(0);
-        _start.setParamSlots(0);
-        _start.setReturnSlots(0);
-        _start.setReturnType(Type::VOID);
-        _start.setName("_start");
-    }
+    void init() ;
 
     Function & get_start() { return _start; }
 
-#ifndef DEBUG
-    friend std::ostream & operator<<(std::ostream & os, const Program & pg)
-    {
-        write(os,(void *)&pg.magic,sizeof(pg.magic));
-        write(os,(void *)&pg.version,sizeof(pg.version));
-        os << pg.globals;
-        os << pg.functions;
-        return os;
-    }
-#else 
-    friend std::ostream & operator<<(std::ostream & os,const Program & pg)
-    {
-        os << "magic:  " << pg.magic << std::endl;
-        os << "version:" <<pg.version << std::endl;
-        os << pg.globals << std::endl;
-        os << pg._start << std::endl;
-        os << pg.functions << std::endl;
-        return os;
-    }
-#endif //DEBUG
+    friend std::ostream & operator<<(std::ostream & os, const Program & pg);
 };
 
 
