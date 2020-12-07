@@ -88,6 +88,8 @@ public:
     int getLocaSlots() const { return loca_slots; }
     int getFid() const { return fid; }
     int nextLoca() { return loca_slots++; }
+    int getInstructionCount() const { return instructions.size(); }
+    Instruction & getInstruction(int id) { return instructions[id]; }
     const std::string & getName() const { return name; }
     Type getReturnType() const { return return_type; }
     const std::vector<Type> & getParamTypes() const { return param_types; }
@@ -100,7 +102,7 @@ public:
     void setLocaSlots(int lslots) { this->loca_slots = lslots; } 
     void setFid(int fid) { this->fid = fid; }
     void setReturnType(Type type) { this->return_type = type; }
-    void addInstruction(const Instruction & instruction) { instructions.push_back(instruction); }
+    int addInstruction(const Instruction & instruction) ;
     void addParamType(Type type) { this->param_types.push_back(type),this->param_slots++; }
     // output
     friend std::ostream & operator<<(std::ostream & os,const Function & f);

@@ -68,9 +68,26 @@ void Analyser::if_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
 void Analyser::while_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {
     expect(TokenType::WHILE_KW);
+    
+    int x = fn.addInstruction(Instruction(Operation::NOP));
+
     expr(vt,ft,fn);
+
+    fn.addInstruction(Instruction(Operation::BR_TRUE,(int)1));
+
+    int id = fn.addInstruction(Instruction(Operation::BR,0)); 
+
     VaribleTable new_vt(vt);
     block_stmt(new_vt,ft,fn);
+
+    int ed = fn.getInstructionCount();
+
+    fn.addInstruction(Instruction(Operation::BR,x-ed-1));
+
+    ed = fn.addInstruction(Instruction(Operation::NOP));
+    auto & jmp = fn.getInstruction(id);
+    jmp.setNum(ed-id);
+    // fn.addInstruction(Instruction(Operation::NOP));
 }
 void Analyser::break_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {

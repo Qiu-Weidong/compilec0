@@ -25,6 +25,14 @@ std::ostream & operator<<(std::ostream & os,const Function & f)
     return os;
 }
 #endif // DEBUG
+
+int Function::addInstruction(const Instruction & instruction)
+{
+    instructions.push_back(instruction);
+    return instructions.size()-1;
+}
+
+
 bool FunctionTable::isDeclared(const std::string &name)
 {
     for (const auto &fn : functions)

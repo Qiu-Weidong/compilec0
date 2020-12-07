@@ -123,6 +123,36 @@ public:
     Instruction(Operation op, long long i64) : op(op), size(8) { this->num.i64; }
     Instruction(Operation op, double f64) : op(op), size(8) { this->num.f64 = f64; }
 
+    void setNum(unsigned int u32)
+    {
+        size = 4;
+        this->num.u32 = u32;
+    }
+
+    void setNum(int i32)
+    {
+        size = 4;
+        this->num.i32 = i32;
+    }
+
+    void setNum(unsigned long long u64)
+    {
+        size = 8;
+        this->num.u64 = u64;
+    }
+
+    void setNum(long long i64)
+    {
+        size = 8;
+        this->num.i64 = i64;
+    }
+
+    void setNum(double f64)
+    {
+        size = 8;
+        this->num.f64 = f64;
+    }
+
 #ifndef DEBUG
     ///////////////////////////////////////////////////////////////////////////
     /// \brief 用于输出的友元函数
