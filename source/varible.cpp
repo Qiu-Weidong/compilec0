@@ -73,7 +73,8 @@ std::ostream & operator<<(std::ostream & os,const Varible & var)
     os << "size:     " << var.size << std::endl;
     if(var.type == Type::STRING) 
     {
-        os << "string: " << str[var.size] << std::endl;
+        assert(str[var.address]!=nullptr);
+        os << "string: " << str[var.address] << std::endl;
     }
     else {
         for(int i=0;i<var.size;i++)
@@ -86,7 +87,7 @@ std::ostream & operator<<(std::ostream & os,const Varible & var)
 
 std::ostream & operator<<(std::ostream & os,const VaribleTable & vt)
 {
-    os << "global counts: "<< vt.table.size();
+    os << "global counts: "<< vt.table.size() << std::endl;
     for(const auto & var : vt.table) os << var;
     return os;
 }

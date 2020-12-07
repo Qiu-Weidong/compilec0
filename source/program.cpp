@@ -44,8 +44,8 @@ std::ostream &operator<<(std::ostream &os, const Program &pg)
 #else
 std::ostream &operator<<(std::ostream &os, const Program &pg)
 {
-    os << "magic:  " << pg.magic << std::endl;
-    os << "version:" << pg.version << std::endl;
+    os << "magic:    " << pg.magic << std::endl;
+    os << "version:  " << pg.version << std::endl;
     os << pg.globals << std::endl;
     os << pg._start << std::endl;
     os << pg.functions << std::endl;

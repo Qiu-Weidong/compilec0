@@ -3,6 +3,15 @@
 Analyser::Analyser(const std::vector<Token> &_tokens) : tokens(_tokens)
 {
     index = 0;
+
+#ifdef DEBUG
+    cur = tokens[index].getTokenType();
+    follow = tokens[index+1].getTokenType();
+
+    curValue = tokens[index].getValue();
+    followValue = tokens[index+1].getValue();
+#endif // DEBUG
+
     sentinel = _tokens.at(_tokens.size() - 1);
 }
 const Token &Analyser::peek() const
@@ -13,6 +22,15 @@ const Token &Analyser::peek() const
 const Token &Analyser::next()
 {
     index++;
+
+#ifdef DEBUG
+    cur = tokens[index].getTokenType();
+    follow = tokens[index+1].getTokenType();
+
+    curValue = tokens[index].getValue();
+    followValue = tokens[index+1].getValue();
+#endif // DEBUG
+
     return tokens[index];
 }
 const Token &Analyser::current() const
@@ -24,6 +42,15 @@ const Token &Analyser::previous()
     if (index <= 0)
         throw Error(ErrorCode::NoToken, "there is no previous token!");
     index--;
+
+#ifdef DEBUG
+    cur = tokens[index].getTokenType();
+    follow = tokens[index+1].getTokenType();
+
+    curValue = tokens[index].getValue();
+    followValue = tokens[index+1].getValue();
+#endif // DEBUG
+
     return tokens[index];
 }
 const Token &Analyser::expect(TokenType type)
@@ -33,6 +60,15 @@ const Token &Analyser::expect(TokenType type)
     index++;
     if (tokens[index].getTokenType() != type)
         throw Error(ErrorCode::ExpectFail, "expect fail", current().getStart());
+    
+#ifdef DEBUG
+    cur = tokens[index].getTokenType();
+    follow = tokens[index+1].getTokenType();
+
+    curValue = tokens[index].getValue();
+    followValue = tokens[index+1].getValue();
+#endif // DEBUG
+
     return tokens[index];
 }
 

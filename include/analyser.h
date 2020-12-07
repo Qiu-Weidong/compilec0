@@ -11,6 +11,16 @@
 class Analyser
 {
 private:
+
+#ifdef DEBUG
+    TokenType cur;
+    TokenType follow;
+
+    std::string curValue;
+    std::string followValue;
+#endif // DEBUG
+
+
     const std::vector<Token> & tokens;
     int index;
     Token sentinel;

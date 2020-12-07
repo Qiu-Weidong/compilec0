@@ -51,8 +51,13 @@ Type Analyser::expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
     if (!isExpressionTermination(peek().getTokenType()))
         return Type::VOID;
     // 建立两个栈，一个用于符号，另一个用于保存类型
+#ifndef DEBUG
     TokenType op[100];
     Type ty[100];
+#else
+    TokenType op[5];
+    Type ty[5];
+#endif // DEBUG
     int t_op = 0;
     int t_ty = 0;
     op[t_op++] = TokenType::NONE; // NONE for '$'
@@ -149,9 +154,10 @@ Type Analyser::expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
     {
         if (ty[t_ty - 1] != ty[t_ty - 2])
             throw Error(ErrorCode::TypeNotMatch, "type does not match!", current().getStart());
+        ty[t_ty++] = operator_expr(ty[t_ty - 1], op[t_op - 1], fn);
         t_ty -= 2;
         t_op--;
-        ty[t_ty++] = operator_expr(ty[t_ty - 1], op[t_op - 1], fn);
+        
     }
     return ty[0];
 }
@@ -380,6 +386,8 @@ Type Analyser::call_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
     }
 
     Function &function = ft.get(name, current().getStart());
+    if(function.getReturnType() != Type::VOID) 
+        fn.addInstruction(Instruction(Operation::STACKALLOC,(unsigned int)1));
 
     // 准备参数，并检查参数列表和函数的声明是否匹配，包括参数个数和类型
     expect(TokenType::L_PAREN);
@@ -399,7 +407,7 @@ Type Analyser::call_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
     expect(TokenType::R_PAREN);
 
     fn.addInstruction(Instruction(Operation::CALL, function.getFid()));
-    return fn.getReturnType();
+    return function.getReturnType();
 }
 Type Analyser::literal_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {

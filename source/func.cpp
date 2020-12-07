@@ -48,10 +48,7 @@ void Analyser::func(VaribleTable &parent, FunctionTable &ft)
     for(auto & param : params) {vt.insert(param,current().getStart()); fn.addParamType(param.getType());}
     block_stmt(vt,ft,fn);
     fn.addInstruction(Instruction(Operation::RET));
-#ifdef DEBUG
-    std::cout << fn << std::endl;
-    printf("fuck!\n");
-#endif // DEBUG
+
     auto & global = parent.getGlobal();
     Varible fn_name("",Kind::GLOBAL,Type::STRING);
     fn_name.setConst(false);
