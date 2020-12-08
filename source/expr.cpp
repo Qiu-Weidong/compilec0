@@ -144,9 +144,10 @@ Type Analyser::expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
                 // 归约
                 if (ty[t_ty - 1] != ty[t_ty - 2])
                     throw Error(ErrorCode::TypeNotMatch, "type does not match!", current().getStart());
+                auto tmp = operator_expr(ty[t_ty-1],op[t_op-1],fn);
                 t_ty -= 2;
                 t_op--;
-                ty[t_ty++] = operator_expr(ty[t_ty - 1], op[t_op - 1], fn);
+                ty[t_ty++] = tmp;
             }
         }
     }
