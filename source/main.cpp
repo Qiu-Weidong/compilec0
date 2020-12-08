@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
         tokenizer.analyse(argv[2]);
         const auto tokens = tokenizer.getTokens();
         Analyser analyser(tokens);
-        for(const auto & token : tokens) std::cout << token << std::endl;
+        // for(const auto & token : tokens) std::cout << token << std::endl;
         // 进行语法分析并生成指令
         analyser.program(program);
         // 输出到二进制文件

@@ -135,7 +135,7 @@ public:
     /// \return 为该函数分配的fid
     /// \exception 如果已经定义，抛出异常
     ///////////////////////////////////////////////
-    int insert(Function & fn, const Position & pos);
+    int insert(const Function & fn, const Position & pos);
 
     /////////////////////////////////////////////////////////////
     /// \brief 按函数名获取函数
@@ -156,6 +156,8 @@ public:
     Function & get(int fid,const Position & pos);
 
     int size() const { return functions.size(); }
+
+    int nextFid() { return next_fid++; }
 
     ////////////////////////////////////////////////////////////////////////////
     /// \brief 输出函数

@@ -391,7 +391,16 @@ Type Analyser::call_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
         return Type::VOID;
     }
 
-    Function &function = ft.get(name, current().getStart());
+    Function * pfn;
+    // 是否是递归调用
+    if(name == fn.getName())
+    {
+        pfn = &fn;
+    }
+    else pfn = &ft.get(name,current().getStart());
+
+    // Function &function = ft.get(name, current().getStart());
+    Function & function = *pfn;
     if(function.getReturnType() != Type::VOID) 
         fn.addInstruction(Instruction(Operation::STACKALLOC,(unsigned int)1));
 

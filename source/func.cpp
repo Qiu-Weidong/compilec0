@@ -13,6 +13,7 @@ void Analyser::func(VaribleTable &parent, FunctionTable &ft)
     auto & name = expect(TokenType::IDENT).getValue();
     if(ft.isDeclared(name)) throw Error(ErrorCode::DuplicateDecl,"function \""+name+"\" is duplicate declared!");
     fn.setName(name);
+    
     expect(TokenType::L_PAREN);
     std::vector<Varible> params;
     params.clear();
@@ -46,6 +47,9 @@ void Analyser::func(VaribleTable &parent, FunctionTable &ft)
     else throw Error(ErrorCode::InvalidType,"function \""+name+"\" return a invalid type!",current().getStart());
 
     for(auto & param : params) {vt.insert(param,current().getStart()); fn.addParamType(param.getType());}
+    
+    fn.setFid(ft.nextFid());
+    
     block_stmt(vt,ft,fn);
     fn.addInstruction(Instruction(Operation::RET));
 
