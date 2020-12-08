@@ -45,8 +45,42 @@ void Analyser::if_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
     expect(TokenType::IF_KW);
     expr(vt,ft,fn);
     VaribleTable new_vt(vt);
+
+    // 如果不满足，直接跳到else(如果有的话)或者跳到if结束
+    int id = fn.addInstruction(Instruction(Operation::BR_FALSE,0));
+
     block_stmt(new_vt,ft,fn);
     new_vt.clear();
+
+    if(peek().getTokenType() == TokenType::ELSE_KW)
+    {
+        next();
+        // 这里是用于if结束直接跳到else后面
+        int id2 = fn.addInstruction(Instruction(Operation::BR,0));
+
+        // 这里if代码块结束
+        
+        auto & jmp = fn.getInstruction(id);
+        jmp.setNum(id2-id);
+
+        if(peek().getTokenType() == TokenType::IF_KW)
+        {
+            if_stmt(vt,ft,fn);
+        }
+        else {
+            block_stmt(new_vt,ft,fn);
+        }
+
+        int id3 = fn.addInstruction(Instruction(Operation::NOP));
+        auto & jmp2 = fn.getInstruction(id2);
+        jmp2.setNum(id3-id2);
+    }
+    else {
+        int id4 = fn.addInstruction(Instruction(Operation::NOP));
+        auto & jmp = fn.getInstruction(id);
+        jmp.setNum(id4-id);
+    }
+/*
     while (peek().getTokenType() == TokenType::ELSE_KW)
     {
         next();
@@ -64,6 +98,7 @@ void Analyser::if_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
             break;
         }
     }
+*/
 }
 void Analyser::while_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {
