@@ -337,7 +337,7 @@ void Tokenizer::analyseChar()
             }
     }
     else {
-        buffer = "" + nextChar;
+        buffer = std::string(1,nextChar);
     }
     getNextChar();
     if(nextChar != '\'') throw Error(ErrorCode::InvalidCharLiteral,"invalid char literal!",currentPos);

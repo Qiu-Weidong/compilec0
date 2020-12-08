@@ -434,6 +434,7 @@ Type Analyser::literal_expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
     }
     else if (t == TokenType::CHAR_LITERAL)
     {
+        // const std::string & v = peek().getValue();
         unsigned long long value = peek().getValue()[0];
         fn.addInstruction(Instruction(Operation::PUSH, value));
         next();
