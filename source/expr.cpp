@@ -129,8 +129,13 @@ Type Analyser::expr(VaribleTable &vt, FunctionTable &ft, Function &fn)
             auto type = peek().getTokenType();
             if (t_op != t_ty || type == TokenType::ASSIGN || type == TokenType::TY)
                 throw Error(ErrorCode::BadExpr, "bad expr", current().getStart());
-            else if(t_ty == 1 && (type == TokenType::R_PAREN || type == TokenType::COMMA))
+            else if(type == TokenType::R_PAREN || type == TokenType::COMMA)
+            {
+                if(t_ty == 1)
                 return ty[0];
+                else break;
+            }
+                
             // 这里开始使用算符优先文法
             // 不会出现 (、ident、和前置-，这时一定是符号
 
