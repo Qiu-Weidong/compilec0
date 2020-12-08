@@ -128,6 +128,7 @@ void Tokenizer::analyseInitial()
         getNextChar();
         if(nextChar == '=')
         {
+            getNextChar();
             tokens.push_back(Token(TokenType::NEQ,pos,currentPos));
         }
         else throw Error(ErrorCode::InvalidSymbol,"\'=\' can\'t follow \'!\'!",currentPos);
