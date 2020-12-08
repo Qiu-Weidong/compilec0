@@ -2,25 +2,35 @@
 
 
 extern int nextGlobalOffset;
-void Analyser::stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
+void Analyser::stmt(VaribleTable &vt, FunctionTable &ft, Function &fn,int while_st)
 {
     auto type = peek().getTokenType();
     if(type == TokenType::LET_KW || type == TokenType::CONST_KW)
         decl_stmt(vt,ft,fn);
     else if(type == TokenType::IF_KW)
-        if_stmt(vt,ft,fn);
+        if_stmt(vt,ft,fn,while_st);
     else if(type == TokenType::WHILE_KW)
         while_stmt(vt,ft,fn);
     else if(type == TokenType::BREAK_KW)
+    {
+        if(while_st == -1) throw Error(ErrorCode::BadBreak,"you should break in a while block!",current().getStart());
         break_stmt(vt,ft,fn);
+        // 加入正无穷 表示待填充
+        fn.addInstruction(Instruction(Operation::BR,2147483647));
+    }
     else if(type == TokenType::CONTINUE_KW)
+    {
+        if(while_st == -1) throw Error(ErrorCode::BadContinue,"you should continue in a while block!",current().getStart());
         continue_stmt(vt,ft,fn);
+        int t = fn.getInstructionCount();
+        fn.addInstruction(Instruction(Operation::BR,while_st-t));
+    }
     else if(type == TokenType::RETURN_KW)
         return_stmt(vt,ft,fn);
     else if(type == TokenType::L_BRACE)
     {
         VaribleTable new_vt(vt);
-        block_stmt(new_vt,ft,fn);
+        block_stmt(new_vt,ft,fn,while_st);
     }
     else if(type == TokenType::SEMICOLON)
         empty_stmt();
@@ -28,11 +38,11 @@ void Analyser::stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
         expr(vt,ft,fn);
     else throw Error(ErrorCode::invalidStmt,"invalid stmt",current().getStart());
 }
-void Analyser::block_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
+void Analyser::block_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn,int while_st )
 {
     expect(TokenType::L_BRACE);
     while (has_next() && peek().getTokenType() != TokenType::R_BRACE)
-        stmt(vt,ft,fn);
+        stmt(vt,ft,fn,while_st);
     expect(TokenType::R_BRACE);
 }
 void Analyser::expr_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
@@ -40,7 +50,7 @@ void Analyser::expr_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
     expr(vt,ft,fn);
     expect(TokenType::SEMICOLON);
 }
-void Analyser::if_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
+void Analyser::if_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn,int while_st )
 {
     expect(TokenType::IF_KW);
     expr(vt,ft,fn);
@@ -49,7 +59,7 @@ void Analyser::if_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
     // 如果不满足，直接跳到else(如果有的话)或者跳到if结束
     int id = fn.addInstruction(Instruction(Operation::BR_FALSE,0));
 
-    block_stmt(new_vt,ft,fn);
+    block_stmt(new_vt,ft,fn,while_st);
     new_vt.clear();
 
     if(peek().getTokenType() == TokenType::ELSE_KW)
@@ -65,10 +75,10 @@ void Analyser::if_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
 
         if(peek().getTokenType() == TokenType::IF_KW)
         {
-            if_stmt(vt,ft,fn);
+            if_stmt(vt,ft,fn,while_st);
         }
         else {
-            block_stmt(new_vt,ft,fn);
+            block_stmt(new_vt,ft,fn,while_st);
         }
 
         int id3 = fn.addInstruction(Instruction(Operation::NOP));
@@ -113,7 +123,7 @@ void Analyser::while_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
     int id = fn.addInstruction(Instruction(Operation::BR,0)); 
 
     VaribleTable new_vt(vt);
-    block_stmt(new_vt,ft,fn);
+    block_stmt(new_vt,ft,fn,x);
 
     int ed = fn.getInstructionCount();
 
@@ -122,7 +132,16 @@ void Analyser::while_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
     ed = fn.addInstruction(Instruction(Operation::NOP));
     auto & jmp = fn.getInstruction(id);
     jmp.setNum(ed-id);
-    // fn.addInstruction(Instruction(Operation::NOP));
+
+    auto & instructions = fn.getInstructions();
+    for(int i=0;i<instructions.size();i++)
+    {
+        if(instructions[i].isBreak())
+        {
+            auto & ins = fn.getInstruction(i);
+            ins.setNum(ed-i);
+        }
+    }
 }
 void Analyser::break_stmt(VaribleTable &vt, FunctionTable &ft, Function &fn)
 {

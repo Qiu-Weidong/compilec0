@@ -55,6 +55,8 @@ enum ErrorCode : int
     ParamNotEnough,
     InvalidCallList,
     BadExpr,
+    BadBreak,
+    BadContinue
 };
 
 class Error : public std::exception

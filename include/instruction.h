@@ -153,6 +153,8 @@ public:
         this->num.f64 = f64;
     }
 
+    bool isBreak() const { return this->num.i32 == 2147483647; }
+
 #ifndef DEBUG
     ///////////////////////////////////////////////////////////////////////////
     /// \brief 用于输出的友元函数

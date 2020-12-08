@@ -74,10 +74,10 @@ private:
     /// \param ft 函数表
     /// \param fn 函数
     /////////////////////////////////////////////////////////////
-    void stmt(VaribleTable & vt,FunctionTable & ft,Function & fn);
-    void block_stmt(VaribleTable & vt,FunctionTable & ft,Function & fn);
+    void stmt(VaribleTable & vt,FunctionTable & ft,Function & fn,int while_st = -1);
+    void block_stmt(VaribleTable & vt,FunctionTable & ft,Function & fn,int while_st = -1);
     void expr_stmt(VaribleTable & vt,FunctionTable & ft,Function & fn);
-    void if_stmt(VaribleTable & vt,FunctionTable & ft,Function & fn);
+    void if_stmt(VaribleTable & vt,FunctionTable & ft,Function & fn,int while_st = -1);
     void while_stmt(VaribleTable & vt,FunctionTable & ft,Function & fn);
     void break_stmt(VaribleTable & vt,FunctionTable & ft,Function & fn);
     void continue_stmt(VaribleTable & vt,FunctionTable & ft,Function & fn);
